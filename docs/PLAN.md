@@ -18,10 +18,12 @@ work, deleting something).
 | Who can use it | You + **two** trusted numbers (stored privately on Vercel, never in code) |
 | Phone service | Your existing Telnyx account and number |
 | Talks with you on calls/texts | Claude Haiku 4.5, hosted by Telnyx (no Anthropic key needed) |
-| Does the bigger jobs | A **Claude Code routine** on your Claude **Pro** account (no Anthropic key needed) |
+| Does the bigger jobs | A **Claude Code routine** on your Claude **Pro** account (no Anthropic key needed), running **Opus 5.5 at Medium effort** |
 | Behind-the-scenes server | Vercel, team **Rudy's projects** |
 | Notes & reminders storage | Airtable |
 | Coding work | Routine works in the repo and opens a **pull request** for you to approve |
+| Repos the routine may work in | **Task-Line only** for now |
+| Google Drive | Later (Phase 7) |
 | Other tasks | Look things up · Send messages for you · Use connected apps · Schedule things for later |
 
 ## 3. Who does what
@@ -141,7 +143,9 @@ Already confirmed from Anthropic's official docs: routines, their private web ad
 - **Allow Telnyx websites** in this environment's network settings
   (`developers.telnyx.com`, `api.telnyx.com`).
 - **Routine:** create it at claude.ai/code/routines (I'll write its instructions),
-  add the API trigger, and save its token privately in Vercel.
+  pick **Opus 5.5** in its model selector, add the API trigger, and save its token
+  privately in Vercel. Medium effort is Opus 5.5's default and is also pinned in
+  this repo's `.claude/settings.json`.
 - **Routine's environment:** allow your Vercel app's web address so it can report back.
 - **GitHub:** the Claude GitHub App on each repo the routine should work in
   (already done for Task-Line).
@@ -150,5 +154,4 @@ Already confirmed from Anthropic's official docs: routines, their private web ad
 
 ## 11. Open questions
 
-1. Which **other GitHub repos** should the routine be allowed to work in, besides Task-Line?
-2. Is **Google Drive** needed early, or can it wait until the end (Phase 7)?
+None right now. Next step: unblock Telnyx access (section 9), then build Phase 1.
