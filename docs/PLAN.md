@@ -18,7 +18,7 @@ work, deleting something).
 | Who can use it | You + **two** trusted numbers (stored privately on Vercel, never in code) |
 | Phone service | Your existing Telnyx account and number |
 | Brain on calls/texts | Claude Haiku 4.5, built into Telnyx |
-| Behind-the-scenes server | Vercel |
+| Behind-the-scenes server | Vercel, team **Rudy's projects** |
 | Notes & reminders storage | Airtable |
 | Coding work | **Option A** — agent files a GitHub issue, Claude's GitHub app does the work and opens a pull request for you to approve |
 | Other tasks | Look things up · Send messages for you · Use connected apps · Schedule things for later |
@@ -94,12 +94,11 @@ before writing code:
 - **GitHub:** install the Claude GitHub app on each project you want coding help with,
   and a GitHub token so the server can create issues.
 - **Airtable:** a base for notes, reminders, and the activity log (I can create it).
-- **Vercel:** pick which team to deploy under ("Rudy's projects" or "EdgeUp").
+- **Vercel:** deploys under the **Rudy's projects** team.
 
 ## 8. Open questions
 
-1. Which **Vercel team** should host this: *Rudy's projects* or *EdgeUp*?
-2. Do you already have an **Anthropic API key**?
-3. Which **GitHub projects** should the agent be allowed to start coding work on?
+1. Do you already have an **Anthropic API key**?
+2. Which **GitHub projects** should the agent be allowed to start coding work on?
    (Just Task-Line, or others too?)
-4. Is **Google Drive** needed early, or can it wait until the end (Phase 7)?
+3. Is **Google Drive** needed early, or can it wait until the end (Phase 7)?
