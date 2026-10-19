@@ -26,7 +26,8 @@ work, deleting something).
 | Coding work | Routine works in the repo and opens a **pull request** for you to approve |
 | Repos the routine may work in | **Task-Line only** for now |
 | Google Drive | Later (Phase 7) |
-| Other tasks | Look things up · Send messages for you · Use connected apps · Schedule things for later |
+| Other tasks | Look things up · Send messages for you · Use connected apps · Schedule things for later · **Check and summarize email** |
+| Email | Done by the routine through the **Gmail** connection on your Claude account. Reading and summarizing need no approval; drafting or sending a reply asks first |
 
 ## 3. Who does what
 
@@ -121,7 +122,7 @@ Each phase ends with something you can test from your phone before moving on.
 | 4. Bigger jobs via routine | "Add a dark mode to Task-Line" → routine → pull request → texted link | A pull request shows up for you to approve |
 | 5. Send messages for me | "Text Sam I'm running late" (with confirmation) | Message is sent only after you say yes |
 | 6. Look things up | Research by the routine, answer by text | Ask a question, get a sourced answer |
-| 7. Connected apps | Airtable first; Google Drive later | Ask about a file or record |
+| 7. Connected apps | Email (Gmail) first, then Airtable and Google Drive | "Check my latest email from Product Hunt" — summary by text |
 
 ## 9. Verified facts (checked, not guessed)
 
@@ -159,4 +160,13 @@ Still to check: which **Vercel plan** you're on (reminder timing may depend on i
 
 ## 11. Open questions
 
-None right now. Next step: unblock Telnyx access (section 9), then build Phase 1.
+None right now.
+
+## 12. Progress
+
+- **Phase 1 — done and live.** Server on Vercel, Task-Line Agent (Claude Haiku 4.5) on
+  number 8100, caller check and Airtable log confirmed working on real calls.
+  Still to test by phone: the "ask first" test action, texting, refusing strangers.
+- **Next: Phase 4 (routine)** so the agent can hand real work to Claude.
+- **Needed for email:** connect Gmail at claude.ai/customize/connectors (installed,
+  not connected yet).
