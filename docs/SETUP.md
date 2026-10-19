@@ -35,11 +35,16 @@ base only.
 
 ## 3. Telnyx
 
-Run `scripts/configure-assistant.mjs` (see the top of the file). It:
+Run `scripts/configure-assistant.mjs` (see the top of the file). In a Claude Code cloud
+session, add `NODE_USE_ENV_PROXY=1` so Node's requests go through the session proxy. It:
 
 1. Saves `TELNYX_ENCRYPTION_KEY` as the Telnyx integration secret `task_line_enc_key`.
 2. Creates or updates the assistant **Task-Line Agent** (Claude Haiku 4.5) with the
    start-of-conversation check and the three "ask first" tools.
+
+Note: `TELNYX_ENCRYPTION_KEY` is stored in Vercel as a *sensitive* value, which can't be
+read back. To re-run the script later, generate a new key, save it in Vercel **and** pass
+it to the script, then redeploy, so both sides match.
 
 Connecting number **8100** to the assistant is a separate step, done only after
 testing, because it takes the number away from the old Kai settings.
@@ -63,3 +68,11 @@ testing, because it takes the number away from the old Kai settings.
 npm install
 npm run check   # type check + tests
 ```
+
+## 6. Current status (Phase 1)
+
+- Server live at `https://task-line-phi.vercel.app` (`/api/health` reports configured).
+- Vercel protection: standard (production address public, previews protected).
+- Telnyx assistant **Task-Line Agent** created (Claude Haiku 4.5), integration secret
+  `task_line_enc_key` saved.
+- Not yet done: connect number 8100, add Telnyx credit, live call/text tests.
