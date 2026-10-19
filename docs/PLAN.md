@@ -160,7 +160,7 @@ Still to check: which **Vercel plan** you're on (reminder timing may depend on i
 
 ## 11. Open questions
 
-- When someone you texted through the agent replies, the agent answers them with
+- When someone you texted through the agent replies, the agent should (not yet tested) answer them with
   "this is a private line." Keep that, or stay silent?
 
 ## 12. Progress
