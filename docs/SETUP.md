@@ -18,6 +18,8 @@ into Vercel's environment variables, never into code, GitHub, or chat.
 | `TRUSTED_CODE_WORD` | Trusted person's code word. **Private.** | **You** |
 | `AIRTABLE_TOKEN` | Airtable personal access token for the Task-Line base. **Private.** | **You** |
 | `AIRTABLE_BASE_ID` | ID of the Task-Line base (starts with `app`) | Claude |
+| `TELNYX_API_KEY` | Telnyx key used to send texts. **Private.** | **You** |
+| `AGENT_PHONE` | The number texts are sent from (8100) | Claude |
 
 Check: open `https://<your-app>.vercel.app/api/health`. It shows `"configured": true`
 when every setting is filled in. It never shows the values.
@@ -78,4 +80,6 @@ npm run check   # type check + tests
 - Number +1 631-212-8100 connected to Task-Line Agent for calls and texts (10DLC
   registration still assigned). Previous routing was the old "Kai Voice Receptionist"
   call app and "Kai" messaging profile, which still serve 8282 and 8273.
-- Not yet done: live call/text tests (Telnyx balance is low; add credit first).
+- Live tests passed: calls and texts reach the agent, caller check and Airtable log work.
+- **send_text** action live (TELNYX_API_KEY and AGENT_PHONE set in Vercel). Awaiting
+  first real test.
