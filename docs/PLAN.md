@@ -16,7 +16,9 @@ work, deleting something).
 | How you reach it | Phone calls **and** text messages |
 | Safety rule | Ask before anything permanent |
 | Who can use it | You + **two** trusted numbers (stored privately on Vercel, never in code) |
-| Phone service | Your existing Telnyx account and number |
+| Extra safety | A **secret code word** is required before anything permanent requested by text, or by a call the phone carrier couldn't confirm |
+| Existing Telnyx setup | Old "Kai" assistants deleted. "Front Desk Receptionist Workflow" is **kept** for later. Old Kai call/text settings stay until 8100 is switched to the new agent |
+| Phone service | Your existing Telnyx account, number **+1 631-212-8100** |
 | Talks with you on calls/texts | Claude Haiku 4.5, hosted by Telnyx (no Anthropic key needed) |
 | Does the bigger jobs | A **Claude Code routine** on your Claude **Pro** account (no Anthropic key needed), running **Opus 5.5 at Medium effort** |
 | Behind-the-scenes server | Vercel, team **Rudy's projects** |
@@ -121,27 +123,30 @@ Each phase ends with something you can test from your phone before moving on.
 | 6. Look things up | Research by the routine, answer by text | Ask a question, get a sourced answer |
 | 7. Connected apps | Airtable first; Google Drive later | Ask about a file or record |
 
-## 9. What I still need to verify (not guessing)
+## 9. Verified facts (checked, not guessed)
 
-These come from Telnyx docs I could only read as search summaries, because this
-environment currently blocks `telnyx.com`. I'll confirm each against the real docs
-before writing code:
+From the Telnyx docs and your account (read-only checks):
 
-- How the Telnyx assistant tells our server **which number is calling or texting**
-  (needed for the trusted-number check).
-- How Telnyx **signs** requests to our server so nobody can fake them.
-- Whether the same assistant can handle **both calls and texts** on one number.
-- Exact setup for the assistant's **webhook tools** (how it calls our server).
-- Which **Vercel plan** you're on — the "Schedules" feature for reminders may depend on it.
+- **Who's contacting:** at the start of every call or text, Telnyx sends our server
+  the caller's number (`telnyx_end_user_target`) in a **signed** message, so it can't
+  be faked in transit. The server answers "allowed" or "not allowed".
+- **Calls vs texts:** for calls, Telnyx says whether the carrier confirmed the number
+  is real (`telnyx_end_user_target_verified`). Texts have no such check — hence the
+  code word.
+- **One assistant handles calls and texts** (`phone_call` and `sms_chat`).
+- **Claude Haiku 4.5** is built in (`anthropic/claude-haiku-4-5`), no Anthropic key.
+- **Webhook tools** let the assistant call our server, with private keys stored as
+  Telnyx "integration secrets".
+- **Your number 8100** is registered for business texting (required in the US).
+- **Routines** (Anthropic docs): API trigger, Pro plan support, limits in section 7.
 
-Already confirmed from Anthropic's official docs: routines, their private web address
-(API trigger), Pro plan support, and the limits above.
+Still to check: which **Vercel plan** you're on (reminder timing may depend on it).
 
 ## 10. What you'll need to set up (I'll give step-by-step instructions)
 
-- **Telnyx:** your API key, added privately to this environment and to Vercel.
-- **Allow Telnyx websites** in this environment's network settings
-  (`developers.telnyx.com`, `api.telnyx.com`).
+- **Telnyx:** key and website access in this environment — **done**. The key will also
+  be added privately to Vercel.
+- **Telnyx credit:** add some before testing (balance was $5.31).
 - **Routine:** create it at claude.ai/code/routines (I'll write its instructions),
   pick **Opus 5.5** in its model selector, add the API trigger, and save its token
   privately in Vercel. Medium effort is Opus 5.5's default and is also pinned in
