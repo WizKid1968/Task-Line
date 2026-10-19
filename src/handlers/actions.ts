@@ -35,7 +35,7 @@ export async function handleRequestAction(req: Request, deps: Deps): Promise<Res
   }
 
   const details = asObject(body["details"]);
-  const problem = def.validate(details);
+  const problem = def.validate(details, { callerName: person.name });
   if (problem) {
     logEvent("request_rejected", { reason: "invalid_details", type, problem });
     return json(400, { error: "invalid_details", message: problem });
@@ -43,7 +43,7 @@ export async function handleRequestAction(req: Request, deps: Deps): Promise<Res
 
   const now = deps.now();
   const needsCodeWord = codeWordRequired(claims.channel, claims.verified);
-  const readBack = def.readBack(details);
+  const readBack = def.readBack(details, { callerName: person.name });
   const pending = await deps.store.createPending({
     code: newPendingCode(),
     action: def.type,
@@ -152,6 +152,7 @@ export async function handleConfirmAction(req: Request, deps: Deps): Promise<Res
       store: deps.store,
       config: deps.config,
       fetchImpl: deps.fetchImpl,
+      now: deps.now,
     });
     await deps.store.updatePending(pending, { status: "done", result });
     await log("action_done", result);

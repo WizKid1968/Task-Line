@@ -4,6 +4,7 @@ import { json, parseJsonObject } from "../http.js";
 import { logEvent, maskPhone } from "../log.js";
 import { normalizeUsPhone } from "../phone.js";
 import { type SessionClaims, verifySessionToken } from "../session.js";
+import type { Outreach } from "../store/types.js";
 import { verifyTelnyxSignature } from "../telnyxSignature.js";
 
 export type ToolAuth =
@@ -120,4 +121,43 @@ export async function authenticateTool(req: Request, deps: Deps): Promise<ToolAu
     keys: Object.keys(body),
   });
   return { ok: true, claims, person, body };
+}
+
+export type RecipientAuth =
+  | { ok: true; phone: string; outreach: Outreach; body: Record<string, unknown> }
+  | { ok: false; response: Response };
+
+/**
+ * For forward_reply: the sender must be someone the agent texted for an allowed
+ * person within the reply window. Telnyx's signature is required (no pass is
+ * ever issued to recipients), and the sender's number comes only from the
+ * Telnyx-filled field. Texts only.
+ */
+export async function authenticateRecipient(req: Request, deps: Deps): Promise<RecipientAuth> {
+  const rawBody = await req.text();
+  const nowSeconds = Math.floor(deps.now().getTime() / 1000);
+  const signature = req.headers.get("telnyx-signature-ed25519");
+  const timestamp = req.headers.get("telnyx-timestamp");
+  const seen: Record<string, unknown> = { path: new URL(req.url).pathname, hasSignature: Boolean(signature), bodyBytes: rawBody.length };
+  const fail = (reason: string, status: number, extra: Record<string, unknown> = {}): RecipientAuth => {
+    deny(seen, reason, status, extra);
+    return { ok: false, response: json(status, { error: "not_authorized", message: "This reply can't be passed along." }) };
+  };
+
+  const signed = verifyTelnyxSignature({ rawBody, signature, timestamp, publicKey: deps.config.telnyxPublicKey, nowSeconds });
+  if (!signed) return fail("bad_signature", 401, { timestamp, now: nowSeconds });
+  const body = parseJsonObject(rawBody);
+  if (!body) return fail("body_not_json", 400);
+
+  const phone = normalizeUsPhone(filled(body[PRESET_FIELDS.callerNumber]));
+  if (!phone) return fail("no_caller_number", 401);
+  if (filled(body[PRESET_FIELDS.channel]) !== "sms_chat") return fail("not_a_text", 403, { caller: maskPhone(phone) });
+  // Allowed people use the normal tools; this is only for recipients.
+  if (findPerson(deps.config, phone)) return fail("allowed_person_not_recipient", 403, { caller: maskPhone(phone) });
+
+  const outreach = await deps.store.findActiveOutreach(phone, deps.now().toISOString());
+  if (!outreach) return fail("no_recent_outreach", 403, { caller: maskPhone(phone) });
+
+  logEvent("recipient_accepted", { ...seen, caller: maskPhone(phone) });
+  return { ok: true, phone, outreach, body };
 }

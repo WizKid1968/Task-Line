@@ -34,7 +34,8 @@ describe("start of conversation", () => {
     const res = await handleInit(signedRequest(INIT, initBody(OWNER_PHONE)), deps);
     expect(res.status).toBe(200);
     const out = (await res.json()) as any;
-    expect(out.dynamic_variables).toEqual({ caller_role: "owner", caller_name: "Owner", code_word_required: "no" });
+    expect(out.dynamic_variables).toMatchObject({ caller_role: "owner", caller_name: "Owner", code_word_required: "no" });
+    expect(Object.keys(out.dynamic_variables).sort()).toEqual(["caller_name", "caller_role", "code_word_required", "role_instructions"]);
     const token = decryptFromTelnyx(out.encrypted_dynamic_variables.session_token, deps.config.telnyxEncryptionKey);
     const claims = verifySessionToken(token, deps.config.sessionSecret, NOW_SECONDS);
     expect(claims).toMatchObject({ role: "owner", phone: OWNER_PHONE, channel: "phone_call", verified: true });

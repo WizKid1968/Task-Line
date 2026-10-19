@@ -11,6 +11,10 @@
 
 import { readFileSync } from "node:fs";
 
+// Safe default for {{role_instructions}} if the server can't be reached: treat
+// everyone as a stranger. Kept in sync with src/agentInstructions.ts by a test.
+const strangerInstructions = readFileSync(new URL("../assistant/stranger-instructions.txt", import.meta.url), "utf8").trim();
+
 const ASSISTANT_NAME = "Task-Line Agent";
 const ENC_SECRET_ID = "task_line_enc_key";
 const API = "https://api.telnyx.com/v2";
@@ -72,7 +76,7 @@ const assistant = {
   dynamic_variables_webhook_url: `${serverUrl}/api/telnyx/init`,
   dynamic_variables_webhook_timeout_ms: 5000,
   // Safe defaults if the server can't be reached: treat the caller as unknown.
-  dynamic_variables: { caller_role: "unknown", caller_name: "", code_word_required: "yes" },
+  dynamic_variables: { caller_role: "unknown", caller_name: "", code_word_required: "yes", role_instructions: strangerInstructions },
   tools: [
     webhookTool(
       "request_action",
@@ -100,6 +104,13 @@ const assistant = {
       "/api/tools/cancel-action",
       { pending_code: { type: "string", description: "The pending_code from request_action." } },
       ["pending_code"],
+    ),
+    webhookTool(
+      "forward_reply",
+      "Only for someone replying to a text you sent. Passes their message, word for word, to the person the text was sent for.",
+      "/api/tools/forward-reply",
+      { message: { type: "string", description: "The person's message, word for word." } },
+      ["message"],
     ),
     { type: "hangup", hangup: { description: "Hang up the call. Use when the caller is not approved, or the conversation is finished." } },
   ],

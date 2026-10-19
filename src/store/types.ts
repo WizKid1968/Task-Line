@@ -29,10 +29,26 @@ export interface ActivityEntry {
   conversation?: string;
 }
 
+/** A text the agent sent for someone, so the recipient's replies can be passed back. */
+export interface Outreach {
+  recipient: string; // who got the text, E.164
+  requestedBy: string; // who asked for it, E.164
+  requesterName: string;
+  message: string; // the text as sent
+  sentAt: string; // ISO time
+  expiresAt: string; // ISO time; replies after this are treated like strangers
+  forwards: number; // replies passed back so far
+  recordId?: string;
+}
+
 export interface Store {
   createPending(p: PendingAction): Promise<PendingAction>;
   /** Find a pending action by its code, only among those requested by `phone`. */
   findPending(code: string, phone: string): Promise<PendingAction | null>;
   updatePending(p: PendingAction, changes: Partial<PendingAction>): Promise<PendingAction>;
   log(entry: ActivityEntry): Promise<void>;
+  recordOutreach(o: Outreach): Promise<Outreach>;
+  /** Most recent outreach to `recipient` that hasn't expired at `nowIso`. */
+  findActiveOutreach(recipient: string, nowIso: string): Promise<Outreach | null>;
+  updateOutreach(o: Outreach, changes: Partial<Outreach>): Promise<Outreach>;
 }

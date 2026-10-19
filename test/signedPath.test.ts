@@ -16,7 +16,7 @@ function presets(over: Record<string, string> = {}) {
   };
 }
 
-const textAction = { action_type: "send_text", details: { to: "9172809243", message: "On my way" } };
+const textAction = { action_type: "send_text", details: { to: "5555550143", message: "On my way" } };
 
 describe("texts: Telnyx signature + Telnyx-filled caller details", () => {
   it("accepts a signed request from an allowed number and requires the code word on texts", async () => {

@@ -160,8 +160,7 @@ Still to check: which **Vercel plan** you're on (reminder timing may depend on i
 
 ## 11. Open questions
 
-- When someone you texted through the agent replies, the agent should (not yet tested) answer them with
-  "this is a private line." Keep that, or stay silent?
+None right now.
 
 ## 12. Progress
 
@@ -169,6 +168,10 @@ Still to check: which **Vercel plan** you're on (reminder timing may depend on i
   number 8100, caller check and Airtable log confirmed working on real calls.
   "Send a text for me" works by call and by text (tested Oct 19: both delivered; texts
   ask for the code word). Still to test: refusing a stranger's number.
+- **Replies (decided Oct 19):** texts sent for you end with "— Sent for <name>". If
+  the recipient replies within 24 hours, the reply is texted to whoever asked for the
+  text and the recipient is told "Got it, I'll pass this along." Anyone else gets only
+  "Sorry, this is a private line and it can't take messages."
 - **Next: Phase 4 (routine)** so the agent can hand real work to Claude.
 - **Needed for email:** connect Gmail at claude.ai/customize/connectors (installed,
   not connected yet).

@@ -1,3 +1,4 @@
+import { memberInstructions, recipientInstructions, STRANGER_INSTRUCTIONS } from "../agentInstructions.js";
 import { codeWordRequired } from "../codeWord.js";
 import { findPerson } from "../config.js";
 import type { Deps } from "../deps.js";
@@ -42,25 +43,43 @@ export async function handleInit(req: Request, deps: Deps): Promise<Response> {
   const conversation = String(payload["call_control_id"] ?? data["id"] ?? "");
   const person = findPerson(deps.config, phone);
 
-  logEvent("init", { caller: maskPhone(phone), channel, verified, allowed: Boolean(person) });
   if (!person) {
+    // Someone the agent texted for an allowed person, replying within the window?
+    // (If they call instead, the agent tells them to text; only texts are forwarded.)
+    let outreach = null;
+    if (phone) {
+      try {
+        outreach = await withTimeout(deps.store.findActiveOutreach(phone, deps.now().toISOString()), 2500);
+      } catch (err) {
+        logEvent("outreach_lookup_failed", { message: err instanceof Error ? err.message : String(err) });
+      }
+    }
+    logEvent("init", { caller: maskPhone(phone), channel, verified, allowed: false, recipient: Boolean(outreach) });
     await bestEffort(
       deps.store.log({
-        who: "unknown",
+        who: outreach ? "recipient" : "unknown",
         phone: rawPhone,
         channel,
-        event: "refused_unknown_caller",
-        details: "Caller is not on the allowed list. No pass was issued.",
+        event: outreach ? "recipient_replied" : "refused_unknown_caller",
+        details: outreach
+          ? `Reply to a text sent for ${outreach.requesterName}. Agent will only forward it.`
+          : "Caller is not on the allowed list. No pass was issued.",
         conversation,
       }),
       700,
     );
     return json(200, {
-      dynamic_variables: { caller_role: "unknown", caller_name: "", code_word_required: "yes" },
+      dynamic_variables: {
+        caller_role: outreach ? "recipient" : "unknown",
+        caller_name: "",
+        code_word_required: "yes",
+        role_instructions: outreach ? recipientInstructions(outreach.requesterName) : STRANGER_INSTRUCTIONS,
+      },
       // An empty section clears any pass left over in this conversation.
       encrypted_dynamic_variables: {},
     });
   }
+  logEvent("init", { caller: maskPhone(phone), channel, verified, allowed: true });
 
   const nowSeconds = Math.floor(deps.now().getTime() / 1000);
   const needsCodeWord = codeWordRequired(channel, verified);
@@ -94,9 +113,17 @@ export async function handleInit(req: Request, deps: Deps): Promise<Response> {
       caller_role: person.role,
       caller_name: person.name,
       code_word_required: needsCodeWord ? "yes" : "no",
+      role_instructions: memberInstructions(person),
     },
     encrypted_dynamic_variables: {
       session_token: encryptForTelnyx(token, deps.config.telnyxEncryptionKey),
     },
   });
+}
+
+function withTimeout<T>(p: Promise<T>, ms: number): Promise<T> {
+  return Promise.race([
+    p,
+    new Promise<T>((_, reject) => setTimeout(() => reject(new Error(`timed out after ${ms} ms`)), ms)),
+  ]);
 }

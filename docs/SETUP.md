@@ -31,6 +31,8 @@ Tables (Claude creates these):
 - **Activity Log** — Event, Time, Who, Phone, Channel, Details, Conversation
 - **Pending Actions** — Code, Status, Action, Summary, Payload, Requested By, Role,
   Channel, Needs Code Word, Created, Expires, Code Word Failures, Result
+- **Outreach** — Recipient, Requested By, Requester Name, Message, Sent, Expires,
+  Forwards (texts sent for someone, so replies within 24 hours can be passed back)
 
 The Airtable token needs `data.records:read` and `data.records:write` access to this
 base only.
@@ -67,6 +69,15 @@ testing, because it takes the number away from the old Kai settings.
    and for calls unless the carrier fully confirmed the number (attestation "A").
    Three wrong code words cancel the request.
 5. Everything is written to the Airtable Activity Log.
+6. **Who sees what.** The server chooses the agent's instructions for each person
+   (`{{role_instructions}}`): full instructions for the two allowed numbers; "pass the
+   reply along" only, for someone texted in the last 24 hours; one fixed "private
+   line" sentence for everyone else. If the server can't be reached, the agent's
+   built-in default is the stranger version.
+7. **Replies.** Texts sent for you end with "— Sent for <name>". A reply within 24
+   hours goes through `forward_reply`, which needs Telnyx's signature, checks the
+   Outreach table, and texts the reply only to whoever asked for the original text
+   (max 10 replies per text sent). Recipients can't use any other tool.
 
 Note: an encrypted per-conversation pass was used at first. Telnyx doesn't attach it
 to tool requests on texts (it silently drops them), so tools now rely on step 2-3.
@@ -91,6 +102,8 @@ npm run check   # type check + tests
 - Live tests passed: calls and texts reach the agent, caller check and Airtable log work.
 - **send_text** works on calls and texts (both tested: texts delivered). On texts the
   code word is required; wrong code words are counted and refused.
+- Replies: texts sent for you are signed, and replies within 24 hours are texted back
+  to whoever asked for the text. Strangers get one fixed "private line" sentence.
 - Re-running the setup script closes old text conversations for the agent, because
   Telnyx keeps each text conversation on the agent version it started with.
 - Text conversations restart after 30 quiet minutes, so one failure can't silence them.

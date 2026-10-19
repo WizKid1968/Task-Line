@@ -1,10 +1,37 @@
 import type { AirtableConfig, Role } from "../config.js";
-import type { ActivityEntry, PendingAction, PendingStatus, Store } from "./types.js";
+import type { ActivityEntry, Outreach, PendingAction, PendingStatus, Store } from "./types.js";
 
 export const TABLES = {
   activity: "Activity Log",
   pending: "Pending Actions",
+  outreach: "Outreach",
 } as const;
+
+function outreachFields(o: Partial<Outreach>): Fields {
+  const f: Fields = {};
+  if (o.recipient !== undefined) f["Recipient"] = o.recipient;
+  if (o.requestedBy !== undefined) f["Requested By"] = o.requestedBy;
+  if (o.requesterName !== undefined) f["Requester Name"] = o.requesterName;
+  if (o.message !== undefined) f["Message"] = o.message;
+  if (o.sentAt !== undefined) f["Sent"] = o.sentAt;
+  if (o.expiresAt !== undefined) f["Expires"] = o.expiresAt;
+  if (o.forwards !== undefined) f["Forwards"] = o.forwards;
+  return f;
+}
+
+function outreachFromRecord(r: AirtableRecord): Outreach {
+  const f = r.fields;
+  return {
+    recordId: r.id,
+    recipient: String(f["Recipient"] ?? ""),
+    requestedBy: String(f["Requested By"] ?? ""),
+    requesterName: String(f["Requester Name"] ?? ""),
+    message: String(f["Message"] ?? ""),
+    sentAt: String(f["Sent"] ?? ""),
+    expiresAt: String(f["Expires"] ?? ""),
+    forwards: Number(f["Forwards"] ?? 0),
+  };
+}
 
 type Fields = Record<string, unknown>;
 
@@ -135,5 +162,39 @@ export class AirtableStore implements Store {
       ],
       typecast: true,
     });
+  }
+
+  async recordOutreach(o: Outreach): Promise<Outreach> {
+    const out = await this.request<{ records: AirtableRecord[] }>("POST", this.url(TABLES.outreach), {
+      records: [{ fields: outreachFields(o) }],
+      typecast: true,
+    });
+    const rec = out.records[0];
+    if (!rec) throw new Error("Airtable returned no record");
+    return outreachFromRecord(rec);
+  }
+
+  async findActiveOutreach(recipient: string, nowIso: string): Promise<Outreach | null> {
+    // Expiry is compared in code (not in the formula) to avoid time-zone surprises.
+    const formula = `{Recipient}=${formulaString(recipient)}`;
+    const params = new URLSearchParams({ filterByFormula: formula, maxRecords: "20" });
+    params.append("sort[0][field]", "Sent");
+    params.append("sort[0][direction]", "desc");
+    const out = await this.request<{ records: AirtableRecord[] }>(
+      "GET",
+      this.url(TABLES.outreach, `?${params.toString()}`),
+    );
+    const now = Date.parse(nowIso);
+    const active = out.records.map(outreachFromRecord).find((o) => Date.parse(o.expiresAt) > now);
+    return active ?? null;
+  }
+
+  async updateOutreach(o: Outreach, changes: Partial<Outreach>): Promise<Outreach> {
+    if (!o.recordId) throw new Error("outreach has no record id");
+    const out = await this.request<AirtableRecord>("PATCH", this.url(TABLES.outreach, `/${o.recordId}`), {
+      fields: outreachFields(changes),
+      typecast: true,
+    });
+    return outreachFromRecord(out);
   }
 }

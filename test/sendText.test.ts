@@ -17,7 +17,7 @@ function fakeTelnyx(ok = true) {
   return { calls, fetchImpl };
 }
 
-const details = { to: "(917) 280-9243", message: "This is a test, testing 1, 2, and 3." };
+const details = { to: "(555) 555-0143", message: "This is a test, testing 1, 2, and 3." };
 
 describe("send a text for me", () => {
   it("reads back the number and message, sends nothing until confirmed", async () => {
@@ -25,7 +25,7 @@ describe("send a text for me", () => {
     const deps = { ...makeDeps(), fetchImpl: tel.fetchImpl };
     const token = sessionFor(deps, { channel: "sms_chat", verified: false });
     const res = (await (await handleRequestAction(toolRequest(REQ, { action_type: "send_text", details }, token), deps)).json()) as any;
-    expect(res.read_back).toBe('I\'ll text 917-280-9243 this message: "This is a test, testing 1, 2, and 3."');
+    expect(res.read_back).toBe('I\'ll text 555-555-0143 this message: "This is a test, testing 1, 2, and 3. — Sent for Owner"');
     expect(res.code_word_required).toBe(true);
     expect(tel.calls).toHaveLength(0);
   });
@@ -46,12 +46,12 @@ describe("send a text for me", () => {
       deps,
     );
     expect(ok.status).toBe(200);
-    expect(((await ok.json()) as any).result).toBe("Text sent to 917-280-9243.");
+    expect(((await ok.json()) as any).result).toBe("Text sent to 555-555-0143. If they reply within 24 hours, their reply will be passed to Owner.");
     expect(tel.calls).toHaveLength(1);
     expect(tel.calls[0]).toEqual({
       url: "https://api.telnyx.com/v2/messages",
       auth: "Bearer test-telnyx-key",
-      body: { from: "+15555550100", to: "+19172809243", text: "This is a test, testing 1, 2, and 3." },
+      body: { from: "+15555550100", to: "+15555550143", text: "This is a test, testing 1, 2, and 3. — Sent for Owner" },
     });
     expect(deps.store.logs.some((l) => l.event === "text_sent" && l.details.includes("msg-123"))).toBe(true);
   });
@@ -59,7 +59,7 @@ describe("send a text for me", () => {
   it("rejects bad numbers and empty or overlong messages before anything is stored", async () => {
     const deps = { ...makeDeps(), fetchImpl: fakeTelnyx().fetchImpl };
     const token = sessionFor(deps);
-    for (const d of [{ to: "123", message: "hi" }, { to: "9172809243", message: "  " }, { to: "9172809243", message: "x".repeat(641) }]) {
+    for (const d of [{ to: "123", message: "hi" }, { to: "5555550143", message: "  " }, { to: "5555550143", message: "x".repeat(641) }]) {
       const r = await handleRequestAction(toolRequest(REQ, { action_type: "send_text", details: d }, token), deps);
       expect(r.status).toBe(400);
     }
