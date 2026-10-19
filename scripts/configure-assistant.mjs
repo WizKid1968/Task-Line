@@ -33,11 +33,17 @@ async function api(method, path, body) {
   return text ? JSON.parse(text) : {};
 }
 
-// The pass header. Telnyx decrypts {{session_token}} with the integration secret
-// and adds it to each tool request; the AI never sees it.
-const authHeaders = [{ name: "Authorization", value: `Bearer {{session_token | ${ENC_SECRET_ID}}}` }];
-// Filled in by Telnyx, not by the AI, so the server can double-check the caller.
-const presetCaller = { caller_number: "{{telnyx_end_user_target}}" };
+// Caller details Telnyx fills into every tool request. The AI can neither see nor
+// change them, and Telnyx's signature on the request covers them. The server
+// requires a valid signature and checks the caller against the allowed numbers.
+// (An encrypted pass header was used before, but Telnyx doesn't attach it on
+// texts and then silently drops the request, so tools rely on these instead.)
+const presetCallerDetails = {
+  caller_number: "{{telnyx_end_user_target}}",
+  conversation_channel: "{{telnyx_conversation_channel}}",
+  caller_attestation: "{{telnyx_shaken_stir_attestation}}",
+  call_ref: "{{call_control_id}}",
+};
 
 function webhookTool(name, description, path, properties, required) {
   return {
@@ -48,9 +54,9 @@ function webhookTool(name, description, path, properties, required) {
       description,
       url: `${serverUrl}${path}`,
       method: "POST",
-      headers: authHeaders,
+      headers: [],
       body_parameters: { type: "object", properties, required },
-      preset_body_fields: presetCaller,
+      preset_body_fields: presetCallerDetails,
     },
   };
 }
