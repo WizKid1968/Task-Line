@@ -1,0 +1,65 @@
+# Task-Line setup guide
+
+This is the checklist for getting Phase 1 running. Values marked **private** go only
+into Vercel's environment variables, never into code, GitHub, or chat.
+
+## 1. Vercel settings (environment variables)
+
+| Name | What it is | Who fills it in |
+|---|---|---|
+| `TELNYX_PUBLIC_KEY` | Telnyx account public key, used to check Telnyx signatures. Not secret. | Claude |
+| `SESSION_SECRET` | Random secret that seals each conversation's pass. **Private.** | Claude (generated) |
+| `TELNYX_ENCRYPTION_KEY` | Random key shared with Telnyx so it can attach the pass to tool requests. **Private.** | Claude (generated) |
+| `OWNER_PHONE` | Owner's phone number | Claude |
+| `OWNER_NAME` | Owner's first name, used in greetings | You |
+| `OWNER_CODE_WORD` | Owner's code word. **Private.** | **You** |
+| `TRUSTED_PHONE` | Trusted person's phone number | Claude |
+| `TRUSTED_NAME` | Trusted person's first name | You |
+| `TRUSTED_CODE_WORD` | Trusted person's code word. **Private.** | **You** |
+| `AIRTABLE_TOKEN` | Airtable personal access token for the Task-Line base. **Private.** | **You** |
+| `AIRTABLE_BASE_ID` | ID of the Task-Line base (starts with `app`) | Claude |
+
+Check: open `https://<your-app>.vercel.app/api/health`. It shows `"configured": true`
+when every setting is filled in. It never shows the values.
+
+## 2. Airtable base "Task-Line"
+
+Tables (Claude creates these):
+
+- **Activity Log** — Event, Time, Who, Phone, Channel, Details, Conversation
+- **Pending Actions** — Code, Status, Action, Summary, Payload, Requested By, Role,
+  Channel, Needs Code Word, Created, Expires, Code Word Failures, Result
+
+The Airtable token needs `data.records:read` and `data.records:write` access to this
+base only.
+
+## 3. Telnyx
+
+Run `scripts/configure-assistant.mjs` (see the top of the file). It:
+
+1. Saves `TELNYX_ENCRYPTION_KEY` as the Telnyx integration secret `task_line_enc_key`.
+2. Creates or updates the assistant **Task-Line Agent** (Claude Haiku 4.5) with the
+   start-of-conversation check and the three "ask first" tools.
+
+Connecting number **8100** to the assistant is a separate step, done only after
+testing, because it takes the number away from the old Kai settings.
+
+## 4. How the safety pieces fit
+
+1. A call or text arrives. Telnyx sends a **signed** message to `/api/telnyx/init`
+   with the caller's number.
+2. If the number is one of the two allowed numbers, the server returns an encrypted
+   per-conversation pass. Otherwise it returns nothing usable.
+3. Every tool request carries that pass, added by Telnyx. The AI never sees it.
+   No pass means the tools refuse.
+4. Permanent actions are two steps: `request_action` (nothing happens) then
+   `confirm_action` after a clear yes, plus the code word for texts and for calls
+   the carrier couldn't confirm. Three wrong code words cancel the request.
+5. Everything is written to the Airtable Activity Log.
+
+## 5. Developer commands
+
+```
+npm install
+npm run check   # type check + tests
+```
