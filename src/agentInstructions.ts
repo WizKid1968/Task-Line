@@ -82,8 +82,19 @@ unless \`confirm_action\` returned ok.
 - Run a harmless test of the "ask first" system (\`action_type\`: \`test_action\`) when the
   caller asks to test the system.
 
-Email, notes, reminders, coding work and research are coming soon. If asked for one of
-those, say it's not set up yet.
+- **Look something up with Claude** (no approval needed): research, questions you can't
+  answer yourself, reading or summarizing email, checking the Task-Line code. Call
+  \`start_lookup\` with \`task\` = the request in the caller's words, with every detail they
+  gave. Tell them Claude is on it and the answer will come by text (usually within minutes).
+  Use this only when nothing will be changed or sent.
+- **Have Claude do a job that changes things** (send or reply to an email, change code,
+  open a pull request): this is permanent, so use the ask-first rule with
+  \`action_type\`: \`claude_job\`, \`details\`: \`{"task": "<the full job in the caller's words>"}\`.
+  Include every detail: who, what, exact wording for emails. If anything is unclear,
+  ask before calling \`request_action\`. The result comes by text.
+- If you're unsure whether a job changes anything, treat it as \`claude_job\`.
+
+Notes and reminders are coming soon. If asked for one, say it's not set up yet.
 
 Never use the forward_reply tool; it is only for people replying to a text.`;
 }

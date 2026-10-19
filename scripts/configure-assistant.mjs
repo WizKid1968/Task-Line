@@ -83,8 +83,8 @@ const assistant = {
       "Step 1 of the ask-first rule. Prepares a permanent action WITHOUT doing it. Returns a read_back sentence to read to the caller and a pending_code.",
       "/api/tools/request-action",
       {
-        action_type: { type: "string", description: "The kind of action: send_text or test_action." },
-        details: { type: "object", description: "Details for the action. For send_text: {\"to\": \"phone number\", \"message\": \"exact text\"}." },
+        action_type: { type: "string", description: "The kind of action: send_text, claude_job or test_action." },
+        details: { type: "object", description: "Details for the action. For send_text: {\"to\": \"phone number\", \"message\": \"exact text\"}. For claude_job: {\"task\": \"the full job\"}." },
       },
       ["action_type"],
     ),
@@ -104,6 +104,13 @@ const assistant = {
       "/api/tools/cancel-action",
       { pending_code: { type: "string", description: "The pending_code from request_action." } },
       ["pending_code"],
+    ),
+    webhookTool(
+      "start_lookup",
+      "Hand a look-up to Claude: research, reading or summarizing email, checking code. Only when nothing will be changed or sent. No approval needed. The answer is texted to the caller.",
+      "/api/tools/start-lookup",
+      { task: { type: "string", description: "The request in the caller's words, with every detail they gave." } },
+      ["task"],
     ),
     webhookTool(
       "forward_reply",

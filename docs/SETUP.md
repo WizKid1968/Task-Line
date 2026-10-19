@@ -20,6 +20,9 @@ into Vercel's environment variables, never into code, GitHub, or chat.
 | `AIRTABLE_BASE_ID` | ID of the Task-Line base (starts with `app`) | Claude |
 | `TELNYX_API_KEY` | Telnyx key used to send texts. **Private.** | **You** |
 | `AGENT_PHONE` | The number texts are sent from (8100) | Claude |
+| `ROUTINE_FIRE_URL` | The routine's API trigger address (`https://api.anthropic.com/v1/claude_code/routines/trig_.../fire`). Not secret. | You (copy from the routine page) |
+| `ROUTINE_TOKEN` | The routine's API trigger token (starts `sk-ant-oat01-`). **Private.** | **You** |
+| `JOB_REPORT_SECRET` | A long random password (32+ characters) the routine sends back with results. Must match the routine environment's network secret. **Private.** | **You** |
 
 Check: open `https://<your-app>.vercel.app/api/health`. It shows `"configured": true`
 when every setting is filled in. It never shows the values.
@@ -33,6 +36,8 @@ Tables (Claude creates these):
   Channel, Needs Code Word, Created, Expires, Code Word Failures, Result
 - **Outreach** — Recipient, Requested By, Requester Name, Message, Sent, Expires,
   Forwards (texts sent for someone, so replies within 24 hours can be passed back)
+- **Jobs** — Job ID, Status, Permission, Task, Requested By, Requester Name, Channel,
+  Session URL, Result, Created, Finished (bigger jobs handed to the routine)
 
 The Airtable token needs `data.records:read` and `data.records:write` access to this
 base only.
@@ -83,14 +88,26 @@ Note: an encrypted per-conversation pass was used at first. Telnyx doesn't attac
 to tool requests on texts (it silently drops them), so tools now rely on step 2-3.
 The server still accepts the pass if present.
 
-## 5. Developer commands
+## 5. Claude routine (bigger jobs)
+
+Look-ups (research, reading email, reading code) start right away with `start_lookup`.
+Jobs that change things (sending email, code changes) use the ask-first action
+`claude_job`. Either way the server starts the routine through its API trigger, with
+the job as text. The routine's instructions are in `docs/ROUTINE_PROMPT.md`. When it
+finishes it POSTs to `/api/jobs/report`; its environment adds `JOB_REPORT_SECRET` as a
+network secret for `task-line-phi.vercel.app`, so the session never sees it. The
+server checks the secret and the job's random id (one report per job) and texts the
+result only to whoever asked. Limits: 10 jobs per person per hour (the routine allows
+30 per hour). Read-only is an instruction to the worker, not a hard lock.
+
+## 6. Developer commands
 
 ```
 npm install
 npm run check   # type check + tests
 ```
 
-## 6. Current status (Phase 1)
+## 7. Current status (Phase 1)
 
 - Server live at `https://task-line-phi.vercel.app` (`/api/health` reports configured).
 - Vercel protection: standard (production address public, previews protected).

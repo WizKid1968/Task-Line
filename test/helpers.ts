@@ -28,6 +28,11 @@ export function makeConfig(): Config {
     telnyxEncryptionKey: randomBytes(32).toString("base64url"),
     airtable: { token: "unused", baseId: "unused" },
     telnyx: { apiKey: "test-telnyx-key", agentPhone: "+15555550100" },
+    routine: {
+      fireUrl: "https://api.anthropic.com/v1/claude_code/routines/trig_TEST123/fire",
+      token: "test-routine-token",
+      reportSecret: "test-report-secret-that-is-long-enough-0123",
+    },
     people: [
       { role: "owner", name: "Owner", phone: OWNER_PHONE, codeWord: "Blue Falcon" },
       { role: "trusted", name: "Friend", phone: TRUSTED_PHONE, codeWord: "green river" },

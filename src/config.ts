@@ -26,6 +26,14 @@ export interface Config {
   airtable: AirtableConfig;
   /** Optional: needed only for actions that send texts. */
   telnyx: TelnyxSendConfig;
+  /** Optional: the Claude Code routine that does bigger jobs. Jobs are off until all three are set. */
+  routine: RoutineConfig;
+}
+
+export interface RoutineConfig {
+  fireUrl: string | null; // ROUTINE_FIRE_URL, https://api.anthropic.com/v1/claude_code/routines/trig_.../fire
+  token: string | null; // ROUTINE_TOKEN, the routine's API trigger token
+  reportSecret: string | null; // JOB_REPORT_SECRET, the routine sends this back when reporting results
 }
 
 export interface TelnyxSendConfig {
@@ -34,6 +42,12 @@ export interface TelnyxSendConfig {
 }
 
 export class ConfigError extends Error {}
+
+const ROUTINE_URL_PATTERN = /^https:\/\/api\.anthropic\.com\/v1\/claude_code\/routines\/trig_[A-Za-z0-9]+\/fire$/;
+
+export function jobsEnabled(config: Config): boolean {
+  return Boolean(config.routine.fireUrl && config.routine.token && config.routine.reportSecret);
+}
 
 type Env = Record<string, string | undefined>;
 
@@ -89,7 +103,15 @@ export function loadConfig(env: Env = process.env): Config {
   if (rawAgentPhone && !agentPhone) throw new ConfigError("AGENT_PHONE is not a valid US phone number");
   const telnyx: TelnyxSendConfig = { apiKey: env["TELNYX_API_KEY"]?.trim() || null, agentPhone };
 
-  return { telnyxPublicKey, people, sessionSecret, telnyxEncryptionKey, airtable, telnyx };
+  const fireUrl = env["ROUTINE_FIRE_URL"]?.trim() || null;
+  if (fireUrl && !ROUTINE_URL_PATTERN.test(fireUrl)) {
+    throw new ConfigError("ROUTINE_FIRE_URL must look like https://api.anthropic.com/v1/claude_code/routines/trig_.../fire");
+  }
+  const reportSecret = env["JOB_REPORT_SECRET"]?.trim() || null;
+  if (reportSecret && reportSecret.length < 32) throw new ConfigError("JOB_REPORT_SECRET must be at least 32 characters");
+  const routine: RoutineConfig = { fireUrl, token: env["ROUTINE_TOKEN"]?.trim() || null, reportSecret };
+
+  return { telnyxPublicKey, people, sessionSecret, telnyxEncryptionKey, airtable, telnyx, routine };
 }
 
 export function findPerson(config: Config, phone: string | null): Person | null {

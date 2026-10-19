@@ -3,6 +3,7 @@ import { getAction, listActionTypes } from "../actions/registry.js";
 import { codeWordMatches, codeWordRequired } from "../codeWord.js";
 import type { Deps } from "../deps.js";
 import { asObject, bestEffort, json } from "../http.js";
+import { JobError } from "../jobs.js";
 import { logEvent } from "../log.js";
 import { authenticateTool } from "./auth.js";
 
@@ -163,7 +164,9 @@ export async function handleConfirmAction(req: Request, deps: Deps): Promise<Res
     await deps.store.updatePending(pending, { status: "failed", result: reason });
     await log("action_failed", reason);
     logEvent("action_failed", { code: pending.code, type: pending.action, reason });
-    return json(502, { ok: false, error: "action_failed", message: "The action failed. Tell the caller it didn't go through." });
+    // Job errors are written for the caller (e.g. "limit reached"); others stay generic.
+    const message = err instanceof JobError ? `It didn't go through: ${err.message}` : "The action failed. Tell the caller it didn't go through.";
+    return json(502, { ok: false, error: "action_failed", message });
   }
 }
 

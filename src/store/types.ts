@@ -41,6 +41,26 @@ export interface Outreach {
   recordId?: string;
 }
 
+export type JobStatus = "starting" | "running" | "done" | "failed";
+/** read_only: look things up, change nothing. approved_changes: the caller approved changes (with code word if needed). */
+export type JobPermission = "read_only" | "approved_changes";
+
+/** A bigger job handed to the Claude Code routine. */
+export interface Job {
+  jobId: string; // random, unguessable; the routine reports back with it
+  status: JobStatus;
+  permission: JobPermission;
+  task: string;
+  requestedBy: string; // E.164; results are texted here
+  requesterName: string;
+  channel: string;
+  sessionUrl?: string;
+  result?: string;
+  createdAt: string;
+  finishedAt?: string;
+  recordId?: string;
+}
+
 export interface Store {
   createPending(p: PendingAction): Promise<PendingAction>;
   /** Find a pending action by its code, only among those requested by `phone`. */
@@ -51,4 +71,9 @@ export interface Store {
   /** Most recent outreach to `recipient` that hasn't expired at `nowIso`. */
   findActiveOutreach(recipient: string, nowIso: string): Promise<Outreach | null>;
   updateOutreach(o: Outreach, changes: Partial<Outreach>): Promise<Outreach>;
+  createJob(j: Job): Promise<Job>;
+  findJob(jobId: string): Promise<Job | null>;
+  updateJob(j: Job, changes: Partial<Job>): Promise<Job>;
+  /** Jobs requested by `phone` created at or after `sinceIso`. */
+  countJobsSince(phone: string, sinceIso: string): Promise<number>;
 }

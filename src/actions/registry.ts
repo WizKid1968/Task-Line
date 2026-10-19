@@ -1,4 +1,5 @@
-import type { Config } from "../config.js";
+import { type Config, findPerson } from "../config.js";
+import { MAX_TASK_CHARS, startJob } from "../jobs.js";
 import { normalizeUsPhone } from "../phone.js";
 import type { SessionClaims } from "../session.js";
 import type { Store } from "../store/types.js";
@@ -127,7 +128,53 @@ const sendTextAction: ActionDefinition = {
   },
 };
 
-const ACTIONS: ActionDefinition[] = [testAction, sendTextAction];
+function jobTask(details: Record<string, unknown>): string {
+  return typeof details["task"] === "string" ? details["task"].trim() : "";
+}
+
+/**
+ * A bigger job for Claude (the routine) that may change things: send an email,
+ * change code, open a pull request. Look-ups that change nothing use the
+ * start_lookup tool instead and need no approval.
+ */
+const claudeJobAction: ActionDefinition = {
+  type: "claude_job",
+  description:
+    'Hand a job that changes things (send an email, change code, open a pull request) to Claude. details: {"task": "the full job in the caller\'s words"}.',
+  validate: (details) => {
+    const task = jobTask(details);
+    if (!task) return "I need to know what the job is.";
+    if (task.length > MAX_TASK_CHARS) return `That's too long (max ${MAX_TASK_CHARS} characters).`;
+    return null;
+  },
+  readBack: (details) =>
+    `I'll have Claude do this job, and it may make changes: "${jobTask(details)}". I'll text you the result when it's done.`,
+  run: async (details, ctx) => {
+    const person = findPerson(ctx.config, ctx.caller.phone);
+    if (!person) throw new Error("Caller is not approved.");
+    const job = await startJob({
+      task: jobTask(details),
+      permission: "approved_changes",
+      person,
+      channel: ctx.caller.channel,
+      store: ctx.store,
+      config: ctx.config,
+      now: ctx.now,
+      fetchImpl: ctx.fetchImpl,
+    });
+    await ctx.store.log({
+      who: ctx.callerName,
+      phone: ctx.caller.phone,
+      channel: ctx.caller.channel,
+      event: "job_started",
+      details: `${job.jobId} (approved changes): ${job.task}`,
+      conversation: ctx.caller.conversation,
+    });
+    return "Claude is working on it. You'll get a text with the result.";
+  },
+};
+
+const ACTIONS: ActionDefinition[] = [testAction, sendTextAction, claudeJobAction];
 
 export function getAction(type: string): ActionDefinition | null {
   return ACTIONS.find((a) => a.type === type) ?? null;

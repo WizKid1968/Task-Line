@@ -1,10 +1,11 @@
-import type { ActivityEntry, Outreach, PendingAction, Store } from "./types.js";
+import type { ActivityEntry, Job, Outreach, PendingAction, Store } from "./types.js";
 
 /** In-memory store for tests. Data disappears when the process ends. */
 export class MemoryStore implements Store {
   pending: PendingAction[] = [];
   logs: ActivityEntry[] = [];
   outreach: Outreach[] = [];
+  jobs: Job[] = [];
 
   async createPending(p: PendingAction): Promise<PendingAction> {
     const saved = { ...p, recordId: `mem${this.pending.length + 1}` };
@@ -49,5 +50,29 @@ export class MemoryStore implements Store {
     const updated = { ...this.outreach[i]!, ...changes };
     this.outreach[i] = updated;
     return { ...updated };
+  }
+
+  async createJob(j: Job): Promise<Job> {
+    const saved = { ...j, recordId: `job${this.jobs.length + 1}` };
+    this.jobs.push(saved);
+    return { ...saved };
+  }
+
+  async findJob(jobId: string): Promise<Job | null> {
+    const found = this.jobs.find((j) => j.jobId === jobId);
+    return found ? { ...found } : null;
+  }
+
+  async updateJob(j: Job, changes: Partial<Job>): Promise<Job> {
+    const i = this.jobs.findIndex((x) => x.recordId === j.recordId);
+    if (i < 0) throw new Error("job not found");
+    const updated = { ...this.jobs[i]!, ...changes };
+    this.jobs[i] = updated;
+    return { ...updated };
+  }
+
+  async countJobsSince(phone: string, sinceIso: string): Promise<number> {
+    const since = Date.parse(sinceIso);
+    return this.jobs.filter((j) => j.requestedBy === phone && Date.parse(j.createdAt) >= since).length;
   }
 }

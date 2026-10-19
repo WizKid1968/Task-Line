@@ -172,6 +172,8 @@ None right now.
   the recipient replies within 24 hours, the reply is texted to whoever asked for the
   text and the recipient is told "Got it, I'll pass this along." Anyone else gets only
   "Sorry, this is a private line and it can't take messages."
-- **Next: Phase 4 (routine)** so the agent can hand real work to Claude.
+- **Phase 4 (routine) — server side built.** Look-ups start right away; jobs that
+  change things go through ask-first. Waiting on: routine created with API trigger,
+  its token in Vercel, its own environment with the report secret, Gmail connected.
 - **Needed for email:** connect Gmail at claude.ai/customize/connectors (installed,
   not connected yet).

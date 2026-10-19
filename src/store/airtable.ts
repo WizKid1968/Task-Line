@@ -1,11 +1,47 @@
 import type { AirtableConfig, Role } from "../config.js";
-import type { ActivityEntry, Outreach, PendingAction, PendingStatus, Store } from "./types.js";
+import type { ActivityEntry, Job, JobPermission, JobStatus, Outreach, PendingAction, PendingStatus, Store } from "./types.js";
 
 export const TABLES = {
   activity: "Activity Log",
   pending: "Pending Actions",
   outreach: "Outreach",
+  jobs: "Jobs",
 } as const;
+
+function jobFields(j: Partial<Job>): Fields {
+  const f: Fields = {};
+  if (j.jobId !== undefined) f["Job ID"] = j.jobId;
+  if (j.status !== undefined) f["Status"] = j.status;
+  if (j.permission !== undefined) f["Permission"] = j.permission;
+  if (j.task !== undefined) f["Task"] = j.task;
+  if (j.requestedBy !== undefined) f["Requested By"] = j.requestedBy;
+  if (j.requesterName !== undefined) f["Requester Name"] = j.requesterName;
+  if (j.channel !== undefined) f["Channel"] = j.channel;
+  if (j.sessionUrl !== undefined) f["Session URL"] = j.sessionUrl;
+  if (j.result !== undefined) f["Result"] = j.result;
+  if (j.createdAt !== undefined) f["Created"] = j.createdAt;
+  if (j.finishedAt !== undefined) f["Finished"] = j.finishedAt;
+  return f;
+}
+
+function jobFromRecord(r: AirtableRecord): Job {
+  const f = r.fields;
+  const opt = (k: string) => (f[k] === undefined ? undefined : String(f[k]));
+  return {
+    recordId: r.id,
+    jobId: String(f["Job ID"] ?? ""),
+    status: (f["Status"] as JobStatus) ?? "starting",
+    permission: (f["Permission"] as JobPermission) ?? "read_only",
+    task: String(f["Task"] ?? ""),
+    requestedBy: String(f["Requested By"] ?? ""),
+    requesterName: String(f["Requester Name"] ?? ""),
+    channel: String(f["Channel"] ?? ""),
+    sessionUrl: opt("Session URL"),
+    result: opt("Result"),
+    createdAt: String(f["Created"] ?? ""),
+    finishedAt: opt("Finished"),
+  };
+}
 
 function outreachFields(o: Partial<Outreach>): Fields {
   const f: Fields = {};
@@ -196,5 +232,41 @@ export class AirtableStore implements Store {
       typecast: true,
     });
     return outreachFromRecord(out);
+  }
+
+  async createJob(j: Job): Promise<Job> {
+    const out = await this.request<{ records: AirtableRecord[] }>("POST", this.url(TABLES.jobs), {
+      records: [{ fields: jobFields(j) }],
+      typecast: true,
+    });
+    const rec = out.records[0];
+    if (!rec) throw new Error("Airtable returned no record");
+    return jobFromRecord(rec);
+  }
+
+  async findJob(jobId: string): Promise<Job | null> {
+    const params = new URLSearchParams({ filterByFormula: `{Job ID}=${formulaString(jobId)}`, maxRecords: "1" });
+    const out = await this.request<{ records: AirtableRecord[] }>("GET", this.url(TABLES.jobs, `?${params.toString()}`));
+    const rec = out.records[0];
+    return rec ? jobFromRecord(rec) : null;
+  }
+
+  async updateJob(j: Job, changes: Partial<Job>): Promise<Job> {
+    if (!j.recordId) throw new Error("job has no record id");
+    const out = await this.request<AirtableRecord>("PATCH", this.url(TABLES.jobs, `/${j.recordId}`), {
+      fields: jobFields(changes),
+      typecast: true,
+    });
+    return jobFromRecord(out);
+  }
+
+  async countJobsSince(phone: string, sinceIso: string): Promise<number> {
+    // Time is compared in code to avoid time-zone surprises in formulas.
+    const params = new URLSearchParams({ filterByFormula: `{Requested By}=${formulaString(phone)}`, pageSize: "100" });
+    params.append("sort[0][field]", "Created");
+    params.append("sort[0][direction]", "desc");
+    const out = await this.request<{ records: AirtableRecord[] }>("GET", this.url(TABLES.jobs, `?${params.toString()}`));
+    const since = Date.parse(sinceIso);
+    return out.records.map(jobFromRecord).filter((j) => Date.parse(j.createdAt) >= since).length;
   }
 }

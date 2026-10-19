@@ -199,7 +199,7 @@ describe("ask first, then act", () => {
     const deps = makeDeps();
     const res = await handleRequestAction(toolRequest(REQ, { action_type: "wire_money" }, sessionFor(deps)), deps);
     expect(res.status).toBe(400);
-    expect(((await res.json()) as any).available_actions).toEqual(["test_action", "send_text"]);
+    expect(((await res.json()) as any).available_actions).toEqual(["test_action", "send_text", "claude_job"]);
   });
 
   it("cancel stops it", async () => {
