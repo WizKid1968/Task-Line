@@ -75,4 +75,7 @@ npm run check   # type check + tests
 - Vercel protection: standard (production address public, previews protected).
 - Telnyx assistant **Task-Line Agent** created (Claude Haiku 4.5), integration secret
   `task_line_enc_key` saved.
-- Not yet done: connect number 8100, add Telnyx credit, live call/text tests.
+- Number +1 631-212-8100 connected to Task-Line Agent for calls and texts (10DLC
+  registration still assigned). Previous routing was the old "Kai Voice Receptionist"
+  call app and "Kai" messaging profile, which still serve 8282 and 8273.
+- Not yet done: live call/text tests (Telnyx balance is low; add credit first).
