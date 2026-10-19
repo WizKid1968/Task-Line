@@ -160,13 +160,15 @@ Still to check: which **Vercel plan** you're on (reminder timing may depend on i
 
 ## 11. Open questions
 
-None right now.
+- When someone you texted through the agent replies, the agent answers them with
+  "this is a private line." Keep that, or stay silent?
 
 ## 12. Progress
 
 - **Phase 1 — done and live.** Server on Vercel, Task-Line Agent (Claude Haiku 4.5) on
   number 8100, caller check and Airtable log confirmed working on real calls.
-  Still to test by phone: the "ask first" test action, texting, refusing strangers.
+  "Send a text for me" works by call and by text (tested Oct 19: both delivered; texts
+  ask for the code word). Still to test: refusing a stranger's number.
 - **Next: Phase 4 (routine)** so the agent can hand real work to Claude.
 - **Needed for email:** connect Gmail at claude.ai/customize/connectors (installed,
   not connected yet).

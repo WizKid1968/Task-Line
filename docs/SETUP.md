@@ -89,6 +89,8 @@ npm run check   # type check + tests
   registration still assigned). Previous routing was the old "Kai Voice Receptionist"
   call app and "Kai" messaging profile, which still serve 8282 and 8273.
 - Live tests passed: calls and texts reach the agent, caller check and Airtable log work.
-- **send_text** works on calls (tested: text delivered). Texting fix (signature +
-  Telnyx-filled caller details) deployed; awaiting first text test.
+- **send_text** works on calls and texts (both tested: texts delivered). On texts the
+  code word is required; wrong code words are counted and refused.
+- Re-running the setup script closes old text conversations for the agent, because
+  Telnyx keeps each text conversation on the agent version it started with.
 - Text conversations restart after 30 quiet minutes, so one failure can't silence them.

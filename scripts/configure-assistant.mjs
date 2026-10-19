@@ -4,7 +4,7 @@
 // Usage:
 //   SERVER_URL=https://<your-vercel-app>.vercel.app \
 //   TELNYX_ENCRYPTION_KEY=<same value as in Vercel> \
-//   [TELNYX_API_KEY=<key>] node scripts/configure-assistant.mjs [--dry-run]
+//   [TELNYX_API_KEY=<key>] node scripts/configure-assistant.mjs [--dry-run] [--skip-secret] [--keep-conversations]
 //
 // TELNYX_API_KEY can be left out where a proxy adds the key automatically.
 // This script does NOT connect a phone number; that is a separate, deliberate step.
@@ -131,3 +131,35 @@ const saved = existing
   : await api("POST", "/ai/assistants", assistant);
 const result = saved.data ?? saved;
 console.log(`${existing ? "Updated" : "Created"} assistant "${ASSISTANT_NAME}" (${result.id}).`);
+
+// 3. Close open text conversations for this assistant. Telnyx keeps each text
+//    conversation on the assistant version it started with, so without this an
+//    old conversation would keep using the old settings. Conversations active in
+//    the last 2 minutes are left alone (someone may be mid-request) and listed.
+//    Use --keep-conversations to skip this step.
+if (!process.argv.includes("--keep-conversations")) {
+  const recentMs = 2 * 60 * 1000;
+  const skipped = new Set();
+  let closed = 0;
+  for (let round = 0; round < 20; round++) {
+    const page = await api("GET", "/ai/conversations?order=created_at.desc&limit=100");
+    const targets = (page.data ?? []).filter(
+      (c) =>
+        c.metadata?.assistant_id === result.id &&
+        c.metadata?.telnyx_conversation_channel === "sms_chat" &&
+        !skipped.has(c.id),
+    );
+    if (targets.length === 0) break;
+    for (const c of targets) {
+      const last = Date.parse(c.last_message_at ?? c.created_at);
+      if (Date.now() - last < recentMs) {
+        skipped.add(c.id);
+        continue;
+      }
+      await api("DELETE", `/ai/conversations/${c.id}`);
+      closed++;
+    }
+  }
+  console.log(`Closed ${closed} old text conversation(s).`);
+  if (skipped.size) console.log(`Left ${skipped.size} active conversation(s) open; re-run in a few minutes to close them.`);
+}
