@@ -60,6 +60,9 @@ const assistant = {
   model: "anthropic/claude-haiku-4-5",
   instructions: readFileSync(new URL("../assistant/instructions.md", import.meta.url), "utf8"),
   enabled_features: ["telephony", "messaging"],
+  // A text conversation that goes quiet for 30 minutes starts fresh next time,
+  // so one stuck exchange can't silence the agent for good.
+  messaging_settings: { conversation_inactivity_minutes: 30 },
   dynamic_variables_webhook_url: `${serverUrl}/api/telnyx/init`,
   dynamic_variables_webhook_timeout_ms: 5000,
   // Safe defaults if the server can't be reached: treat the caller as unknown.
