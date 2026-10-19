@@ -16,10 +16,12 @@ const ENC_SECRET_ID = "task_line_enc_key";
 const API = "https://api.telnyx.com/v2";
 
 const dryRun = process.argv.includes("--dry-run");
+// --skip-secret: keep the existing Telnyx integration secret (use when the key hasn't changed).
+const skipSecret = process.argv.includes("--skip-secret");
 const serverUrl = (process.env.SERVER_URL ?? "").replace(/\/+$/, "");
 const encKey = process.env.TELNYX_ENCRYPTION_KEY ?? "";
 if (!/^https:\/\//.test(serverUrl)) throw new Error("Set SERVER_URL to the https address of the Vercel app");
-if (Buffer.from(encKey, "base64url").length !== 32) throw new Error("Set TELNYX_ENCRYPTION_KEY (32 bytes, base64url)");
+if (!process.argv.includes("--skip-secret") && Buffer.from(encKey, "base64url").length !== 32) throw new Error("Set TELNYX_ENCRYPTION_KEY (32 bytes, base64url)");
 
 const headers = { "Content-Type": "application/json" };
 if (process.env.TELNYX_API_KEY) headers.Authorization = `Bearer ${process.env.TELNYX_API_KEY}`;
@@ -68,8 +70,8 @@ const assistant = {
       "Step 1 of the ask-first rule. Prepares a permanent action WITHOUT doing it. Returns a read_back sentence to read to the caller and a pending_code.",
       "/api/tools/request-action",
       {
-        action_type: { type: "string", description: "The kind of action. Currently available: test_action." },
-        details: { type: "object", description: "Details for the action, e.g. {\"label\": \"a quick test\"}." },
+        action_type: { type: "string", description: "The kind of action: send_text or test_action." },
+        details: { type: "object", description: "Details for the action. For send_text: {\"to\": \"phone number\", \"message\": \"exact text\"}." },
       },
       ["action_type"],
     ),
@@ -100,6 +102,7 @@ if (dryRun) {
 }
 
 // 1. Encryption key as an integration secret (create once; update if it exists).
+if (!skipSecret) {
 const secrets = await api("GET", "/integration_secrets");
 const existingSecret = (secrets.data ?? []).find((s) => s.identifier === ENC_SECRET_ID);
 if (existingSecret) {
@@ -107,6 +110,9 @@ if (existingSecret) {
 }
 await api("POST", "/integration_secrets", { identifier: ENC_SECRET_ID, type: "bearer", token: encKey });
 console.log(`Integration secret "${ENC_SECRET_ID}" saved.`);
+} else {
+  console.log(`Keeping existing integration secret "${ENC_SECRET_ID}".`);
+}
 
 // 2. Create or update the assistant.
 const list = await api("GET", "/ai/assistants");

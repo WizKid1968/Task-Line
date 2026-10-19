@@ -27,6 +27,7 @@ export function makeConfig(): Config {
     sessionSecret: "test-session-secret-that-is-long-enough-123",
     telnyxEncryptionKey: randomBytes(32).toString("base64url"),
     airtable: { token: "unused", baseId: "unused" },
+    telnyx: { apiKey: "test-telnyx-key", agentPhone: "+15555550100" },
     people: [
       { role: "owner", name: "Owner", phone: OWNER_PHONE, codeWord: "Blue Falcon" },
       { role: "trusted", name: "Friend", phone: TRUSTED_PHONE, codeWord: "green river" },

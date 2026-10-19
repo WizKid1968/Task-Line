@@ -24,6 +24,13 @@ export interface Config {
   /** base64url 32-byte key, also stored in Telnyx as an integration secret. */
   telnyxEncryptionKey: string;
   airtable: AirtableConfig;
+  /** Optional: needed only for actions that send texts. */
+  telnyx: TelnyxSendConfig;
+}
+
+export interface TelnyxSendConfig {
+  apiKey: string | null; // TELNYX_API_KEY
+  agentPhone: string | null; // AGENT_PHONE, the number texts are sent from (E.164)
 }
 
 export class ConfigError extends Error {}
@@ -77,7 +84,12 @@ export function loadConfig(env: Env = process.env): Config {
     throw new ConfigError("OWNER_PHONE and TRUSTED_PHONE must be different");
   }
 
-  return { telnyxPublicKey, people, sessionSecret, telnyxEncryptionKey, airtable };
+  const rawAgentPhone = env["AGENT_PHONE"]?.trim();
+  const agentPhone = rawAgentPhone ? normalizeUsPhone(rawAgentPhone) : null;
+  if (rawAgentPhone && !agentPhone) throw new ConfigError("AGENT_PHONE is not a valid US phone number");
+  const telnyx: TelnyxSendConfig = { apiKey: env["TELNYX_API_KEY"]?.trim() || null, agentPhone };
+
+  return { telnyxPublicKey, people, sessionSecret, telnyxEncryptionKey, airtable, telnyx };
 }
 
 export function findPerson(config: Config, phone: string | null): Person | null {

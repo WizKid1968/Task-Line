@@ -7,6 +7,8 @@ export interface Deps {
   config: Config;
   store: Store;
   now: () => Date;
+  /** Override for outgoing requests (used in tests). */
+  fetchImpl?: typeof fetch;
 }
 
 let cached: Deps | null = null;

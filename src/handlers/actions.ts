@@ -140,7 +140,13 @@ export async function handleConfirmAction(req: Request, deps: Deps): Promise<Res
 
   pending = await deps.store.updatePending(pending, { status: "running" });
   try {
-    const result = await def.run(pending.payload, { caller: claims, callerName: person.name, store: deps.store });
+    const result = await def.run(pending.payload, {
+      caller: claims,
+      callerName: person.name,
+      store: deps.store,
+      config: deps.config,
+      fetchImpl: deps.fetchImpl,
+    });
     await deps.store.updatePending(pending, { status: "done", result });
     await log("action_done", result);
     return json(200, { ok: true, result });
