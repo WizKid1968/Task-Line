@@ -54,15 +54,23 @@ testing, because it takes the number away from the old Kai settings.
 ## 4. How the safety pieces fit
 
 1. A call or text arrives. Telnyx sends a **signed** message to `/api/telnyx/init`
-   with the caller's number.
-2. If the number is one of the two allowed numbers, the server returns an encrypted
-   per-conversation pass. Otherwise it returns nothing usable.
-3. Every tool request carries that pass, added by Telnyx. The AI never sees it.
-   No pass means the tools refuse.
+   with the caller's number. The server logs it and tells the agent the caller's
+   name and role (or "unknown").
+2. Every tool request carries the caller's number, the channel (call or text) and,
+   for calls, the carrier's confirmation level. **Telnyx fills these in itself**;
+   the AI can't see or change them.
+3. The server requires **Telnyx's signature** on each tool request (max 5 minutes
+   old; it covers the whole request, including those details) and checks the
+   caller against the two allowed numbers. Strangers are refused.
 4. Permanent actions are two steps: `request_action` (nothing happens) then
-   `confirm_action` after a clear yes, plus the code word for texts and for calls
-   the carrier couldn't confirm. Three wrong code words cancel the request.
+   `confirm_action` after a clear yes. The **code word** is required for texts,
+   and for calls unless the carrier fully confirmed the number (attestation "A").
+   Three wrong code words cancel the request.
 5. Everything is written to the Airtable Activity Log.
+
+Note: an encrypted per-conversation pass was used at first. Telnyx doesn't attach it
+to tool requests on texts (it silently drops them), so tools now rely on step 2-3.
+The server still accepts the pass if present.
 
 ## 5. Developer commands
 
@@ -81,5 +89,6 @@ npm run check   # type check + tests
   registration still assigned). Previous routing was the old "Kai Voice Receptionist"
   call app and "Kai" messaging profile, which still serve 8282 and 8273.
 - Live tests passed: calls and texts reach the agent, caller check and Airtable log work.
-- **send_text** action live (TELNYX_API_KEY and AGENT_PHONE set in Vercel). Awaiting
-  first real test.
+- **send_text** works on calls (tested: text delivered). Texting fix (signature +
+  Telnyx-filled caller details) deployed; awaiting first text test.
+- Text conversations restart after 30 quiet minutes, so one failure can't silence them.
