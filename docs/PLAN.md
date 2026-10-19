@@ -15,7 +15,7 @@ work, deleting something).
 |---|---|
 | How you reach it | Phone calls **and** text messages |
 | Safety rule | Ask before anything permanent |
-| Who can use it | You + **two** trusted numbers (stored privately on Vercel, never in code) |
+| Who can use it | **Two numbers total:** yours + **one** trusted person (stored privately on Vercel, never in code) |
 | Extra safety | A **secret code word** is required before anything permanent requested by text, or by a call the phone carrier couldn't confirm |
 | Existing Telnyx setup | Old "Kai" assistants deleted. "Front Desk Receptionist Workflow" is **kept** for later. Old Kai call/text settings stay until 8100 is switched to the new agent |
 | Phone service | Your existing Telnyx account, number **+1 631-212-8100** |
@@ -85,8 +85,8 @@ allowance. Routines are a **preview feature**, so details may change.
 
 ## 6. Safety design
 
-1. **Trusted numbers only.** Every request is checked against your number plus the
-   two trusted numbers. Anyone else gets a polite "sorry, I can't help" and nothing runs.
+1. **Trusted numbers only.** Every request is checked against the two allowed numbers
+   (yours and one trusted person). Anyone else gets a polite "sorry, I can't help" and nothing runs.
 2. **Two-step for anything permanent.** The server never does a permanent action on
    the first request. It first creates a "pending" action and the agent reads it back:
    *"I'll text Sam: 'Running 10 min late.' Should I send it?"* Only a clear "yes"
