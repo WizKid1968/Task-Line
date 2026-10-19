@@ -5,6 +5,7 @@ import { encryptForTelnyx } from "../encrypt.js";
 import { bestEffort, json, parseJsonObject } from "../http.js";
 import { normalizeUsPhone } from "../phone.js";
 import { createSessionToken } from "../session.js";
+import { logEvent, maskPhone } from "../log.js";
 import { verifyTelnyxSignature } from "../telnyxSignature.js";
 
 const CALL_PASS_SECONDS = 2 * 60 * 60; // calls are limited to 30 min; 2h is generous
@@ -26,6 +27,7 @@ export async function handleInit(req: Request, deps: Deps): Promise<Response> {
     nowSeconds: Math.floor(deps.now().getTime() / 1000),
   });
   if (!signed) {
+    logEvent("init_rejected", { reason: "bad_signature", hasSignature: req.headers.has("telnyx-signature-ed25519") });
     return json(401, { error: "bad_signature" });
   }
 
@@ -40,6 +42,7 @@ export async function handleInit(req: Request, deps: Deps): Promise<Response> {
   const conversation = String(payload["call_control_id"] ?? data["id"] ?? "");
   const person = findPerson(deps.config, phone);
 
+  logEvent("init", { caller: maskPhone(phone), channel, verified, allowed: Boolean(person) });
   if (!person) {
     await bestEffort(
       deps.store.log({

@@ -3,6 +3,7 @@ import { getAction, listActionTypes } from "../actions/registry.js";
 import { codeWordMatches, codeWordRequired } from "../codeWord.js";
 import type { Deps } from "../deps.js";
 import { asObject, bestEffort, json } from "../http.js";
+import { logEvent } from "../log.js";
 import { authenticateTool } from "./auth.js";
 
 const PENDING_MINUTES = 10;
@@ -25,6 +26,7 @@ export async function handleRequestAction(req: Request, deps: Deps): Promise<Res
   const type = typeof body["action_type"] === "string" ? body["action_type"].trim() : "";
   const def = getAction(type);
   if (!def) {
+    logEvent("request_rejected", { reason: "unknown_action", type });
     return json(400, {
       error: "unknown_action",
       message: "That action isn't available yet.",
@@ -34,7 +36,10 @@ export async function handleRequestAction(req: Request, deps: Deps): Promise<Res
 
   const details = asObject(body["details"]);
   const problem = def.validate(details);
-  if (problem) return json(400, { error: "invalid_details", message: problem });
+  if (problem) {
+    logEvent("request_rejected", { reason: "invalid_details", type, problem });
+    return json(400, { error: "invalid_details", message: problem });
+  }
 
   const now = deps.now();
   const needsCodeWord = codeWordRequired(claims.channel, claims.verified);
@@ -54,6 +59,7 @@ export async function handleRequestAction(req: Request, deps: Deps): Promise<Res
     failures: 0,
   });
 
+  logEvent("action_requested", { code: pending.code, type: def.type, needsCodeWord });
   await bestEffort(
     deps.store.log({
       who: person.name,
@@ -149,11 +155,13 @@ export async function handleConfirmAction(req: Request, deps: Deps): Promise<Res
     });
     await deps.store.updatePending(pending, { status: "done", result });
     await log("action_done", result);
+    logEvent("action_done", { code: pending.code, type: pending.action });
     return json(200, { ok: true, result });
   } catch (err) {
     const reason = err instanceof Error ? err.message : String(err);
     await deps.store.updatePending(pending, { status: "failed", result: reason });
     await log("action_failed", reason);
+    logEvent("action_failed", { code: pending.code, type: pending.action, reason });
     return json(502, { ok: false, error: "action_failed", message: "The action failed. Tell the caller it didn't go through." });
   }
 }

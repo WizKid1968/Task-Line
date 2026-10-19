@@ -37,7 +37,7 @@ export function withDeps(handler: (req: Request, deps: Deps) => Promise<Response
     try {
       return await handler(req, deps);
     } catch (err) {
-      console.error("Unhandled error:", err instanceof Error ? err.message : err);
+      console.error(JSON.stringify({ event: "unhandled_error", path: new URL(req.url).pathname, message: err instanceof Error ? err.message : String(err) }));
       return json(500, { error: "server_error", message: "Something went wrong on the server. Nothing was done." });
     }
   };
