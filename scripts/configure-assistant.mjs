@@ -19,7 +19,8 @@ const strangerInstructions = readFileSync(new URL("../assistant/stranger-instruc
 // The record name in Telnyx (how the script finds it again) and the name callers hear.
 const ASSISTANT_NAME = process.env.TELNYX_ASSISTANT_NAME || "Task-Line Agent";
 const SPOKEN_NAME = process.env.ASSISTANT_NAME || "Opus";
-const ENC_SECRET_ID = "task_line_enc_key";
+// Unique per client when several assistants share one Telnyx account.
+const ENC_SECRET_ID = process.env.TELNYX_SECRET_ID || "task_line_enc_key";
 const API = "https://api.telnyx.com/v2";
 
 const dryRun = process.argv.includes("--dry-run");

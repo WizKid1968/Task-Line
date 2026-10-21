@@ -1,0 +1,16 @@
+{
+  "_note": "One client's NON-secret details. Never put code words, passwords or API keys here. Keep the filled-in copy outside this repository.",
+  "CLIENT_SLUG": "acme",
+  "ASSISTANT_NAME": "Opus",
+  "OWNER_NAME": "Sam",
+  "OWNER_PHONE": "+19175550101",
+  "TRUSTED_NAME": "Alex",
+  "TRUSTED_PHONE": "+19175550102",
+  "AGENT_PHONE": "+16315550100",
+  "SERVER_HOST": "opus-acme.vercel.app",
+  "CODE_REPO": "acme-org/acme-opus",
+  "SYSTEM_BASE_NAME": "Opus System",
+  "TIME_ZONE_LABEL": "New York",
+  "SUPPORT_CONTACT": "your name, phone and email",
+  "APPS": ["Gmail", "Google Calendar"]
+}

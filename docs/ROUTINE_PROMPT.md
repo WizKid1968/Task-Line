@@ -1,7 +1,8 @@
 # Task-Line worker: instructions
 
 This is a copy of the instructions saved in the "Task-Line worker" routine (last updated
-October 21, 2026). If you change them in the routine, update this copy too.
+October 21, 2026). If you change them in the routine, update this copy too, and the client template in
+`.claude/skills/opus-builder/templates/worker-prompt.md`.
 
 Paste everything between the two lines below into the routine's instructions box.
 
