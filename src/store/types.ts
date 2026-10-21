@@ -61,7 +61,7 @@ export interface Job {
   recordId?: string;
 }
 
-/** Someone Rudy or the trusted person can text by name. */
+/** Someone the owner or the trusted person can text by name. */
 export interface Contact {
   name: string;
   phone: string; // as stored, e.g. "917-555-0101"; read with normalizeUsPhone

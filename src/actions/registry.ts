@@ -122,11 +122,11 @@ const sendTextAction: ActionDefinition = {
       details: `To ${to}: "${text}" (Telnyx id ${sent.id})`,
       conversation: ctx.caller.conversation,
     });
-    // An approved person (owner or trusted) who replies is talking to Opus
+    // An approved person (owner or trusted) who replies is talking to the assistant
     // directly, not being passed along, so don't promise that.
     const approvedRecipient = findPerson(ctx.config, to!);
     if (approvedRecipient) {
-      return `Text sent to ${approvedRecipient.name} (${prettyPhone(to!)}). ${approvedRecipient.name} can use Opus too, so a reply from ${approvedRecipient.name} goes to Opus as their own conversation and is not passed to ${ctx.callerName}.`;
+      return `Text sent to ${approvedRecipient.name} (${prettyPhone(to!)}). ${approvedRecipient.name} can use ${ctx.config.assistantName} too, so a reply from ${approvedRecipient.name} goes to ${ctx.config.assistantName} as their own conversation and is not passed to ${ctx.callerName}.`;
     }
     // Remember the recipient so their replies can be passed back. The text is
     // already sent, so a failure here is logged but doesn't fail the action.
@@ -191,7 +191,7 @@ const claudeJobAction: ActionDefinition = {
       details: `${job.jobId} (approved changes): ${job.task}`,
       conversation: ctx.caller.conversation,
     });
-    return "Opus is on it. You'll get a text with the result.";
+    return `${ctx.config.assistantName} is on it. You'll get a text with the result.`;
   },
 };
 

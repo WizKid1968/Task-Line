@@ -69,7 +69,7 @@ export async function handleStartLookup(req: Request, deps: Deps): Promise<Respo
       }),
       1500,
     );
-    return json(200, { ok: true, message: "Opus is on it. The answer will come by text." });
+    return json(200, { ok: true, message: `${deps.config.assistantName} is on it. The answer will come by text.` });
   } catch (err) {
     if (err instanceof JobError) return json(400, { ok: false, error: "job_not_started", message: err.message });
     throw err;
@@ -141,7 +141,7 @@ export async function handleJobReport(req: Request, deps: Deps): Promise<Respons
       finishedAt: deps.now().toISOString(),
     });
     logEvent("job_result_held", { jobId, reasons: verdict.reasons });
-    const alert = `Opus: a result was held for your safety because ${why}. The full result is in the Jobs table in Airtable (job ending ${jobId.slice(-6)}).`;
+    const alert = `${deps.config.assistantName}: a result was held for your safety because ${why}. The full result is in the Jobs table in Airtable (job ending ${jobId.slice(-6)}).`;
     try {
       await sendText(deps.config.telnyx, job.requestedBy, alert, deps.fetchImpl);
     } catch (err) {
@@ -154,7 +154,8 @@ export async function handleJobReport(req: Request, deps: Deps): Promise<Respons
     return json(200, { ok: true, held: true });
   }
 
-  const head = status === "done" ? "Opus: done." : "Opus: that didn't work.";
+  const name = deps.config.assistantName;
+  const head = status === "done" ? `${name}: done.` : `${name}: that didn't work.`;
   const tail = link ? `\n${link}` : "";
   const room = MAX_RESULT_TEXT - head.length - tail.length - 1;
   const text = `${head}\n${summary.length > room ? `${summary.slice(0, room - 1)}…` : summary}${tail}`;

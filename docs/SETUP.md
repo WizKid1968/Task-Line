@@ -24,6 +24,7 @@ into Vercel's environment variables, never into code, GitHub, or chat.
 | `ROUTINE_TOKEN` | The routine's API trigger token (starts `sk-ant-oat01-`). **Private.** | **You** |
 | `JEV_API_KEY` | Jev (TypeSafe AI) key for the safety checks. **Private.** Without it every check takes the safer path. | **You** |
 | `CRON_SECRET` | Password Vercel's daily scheduler sends to the watchdog. **Private.** | Claude (generated) |
+| `ASSISTANT_NAME` | The name the assistant uses for itself (default `Opus`). Optional. | You |
 | `JOB_REPORT_SECRET` | A long random password (32+ characters) the routine sends back with results. Must match the routine environment's network secret. **Private.** | **You** |
 
 Check: open `https://<your-app>.vercel.app/api/health`. It shows `"configured": true`

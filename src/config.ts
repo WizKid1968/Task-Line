@@ -30,6 +30,8 @@ export interface Config {
   routine: RoutineConfig;
   /** Optional: Jev (TypeSafe AI) safety checks. Without a key every check takes the safer path. */
   jevApiKey: string | null; // JEV_API_KEY
+  /** The assistant's name in replies, e.g. "Opus" (ASSISTANT_NAME, default "Opus"). */
+  assistantName: string;
   /** Optional: Vercel sends this with its daily scheduled call to the watchdog. */
   cronSecret: string | null; // CRON_SECRET
 }
@@ -124,6 +126,7 @@ export function loadConfig(env: Env = process.env): Config {
     telnyx,
     routine,
     jevApiKey: env["JEV_API_KEY"]?.trim() || null,
+    assistantName: env["ASSISTANT_NAME"]?.trim() || "Opus",
     cronSecret: env["CRON_SECRET"]?.trim() || null,
   };
 }

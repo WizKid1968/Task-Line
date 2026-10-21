@@ -63,7 +63,7 @@ export async function checkJob(apiKey: string | null, task: string, fetchImpl?: 
   const a = await askJev(apiKey, `Task requested by the owner: ${task}`, JOB_QUESTIONS, fetchImpl, "job");
   if (!a) return { block: null, forceCodeWord: true, note: "safety check unavailable; code word required" };
   if (a.money >= JOB_MONEY_CUTOFF) {
-    return { block: "Opus can't do anything involving payments, purchases, bookings that cost money, or trades.", forceCodeWord: true, note: `money ${a.money}` };
+    return { block: "The assistant can't do anything involving payments, purchases, bookings that cost money, or trades.", forceCodeWord: true, note: `money ${a.money}` };
   }
   if (a.risky >= JOB_RISKY_CUTOFF) return { block: null, forceCodeWord: true, note: `risky ${a.risky}; code word required` };
   return { block: null, forceCodeWord: false, note: `money ${a.money}, risky ${a.risky}` };

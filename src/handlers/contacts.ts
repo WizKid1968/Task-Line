@@ -4,7 +4,7 @@ import { json } from "../http.js";
 import { logEvent } from "../log.js";
 import { authenticateTool } from "./auth.js";
 
-/** find_contact tool: look up a saved contact's number. Only for Rudy and the trusted person. */
+/** find_contact tool: look up a saved contact's number. Only for the owner and the trusted person. */
 export async function handleFindContact(req: Request, deps: Deps): Promise<Response> {
   const auth = await authenticateTool(req, deps);
   if (!auth.ok) return auth.response;

@@ -34,6 +34,7 @@ export function makeConfig(): Config {
       reportSecret: "test-report-secret-that-is-long-enough-0123",
     },
     jevApiKey: "test-jev-key",
+    assistantName: "Opus",
     cronSecret: "test-cron-secret",
     people: [
       { role: "owner", name: "Owner", phone: OWNER_PHONE, codeWord: "Blue Falcon" },

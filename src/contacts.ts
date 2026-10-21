@@ -3,7 +3,7 @@ import { normalizeUsPhone } from "./phone.js";
 import type { Store } from "./store/types.js";
 
 /**
- * The contact list. Rudy and the trusted person come from the server settings
+ * The contact list. The owner and the trusted person come from the server settings
  * (always present, can't be changed by a text); everyone else is saved in the
  * Task-Line Airtable base, which only the server touches.
  */

@@ -140,3 +140,12 @@ describe("Spanish code words", () => {
     expect(cwm("corazones", "corazón")).toBe(false);
   });
 });
+
+describe("assistant name setting", () => {
+  it("uses the configured name in the member instructions", async () => {
+    const { memberInstructions } = await import("../src/agentInstructions.js");
+    const text = memberInstructions({ name: "Owner", phone: "+19175550101", role: "owner", codeWord: "x" } as any, "Nova");
+    expect(text).toContain("Nova is on it");
+    expect(text).not.toContain("Opus");
+  });
+});

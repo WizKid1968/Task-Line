@@ -10,7 +10,7 @@ import { sendText } from "../telnyxSend.js";
 /**
  * Checkpoint 5: once a day, read the phone agent's conversations from the last
  * 24 hours and ask Jev two things:
- *  - with Rudy or the trusted person: did the agent refuse or answer on its own
+ *  - with the owner or the trusted person: did the agent refuse or answer on its own
  *    instead of handing the request to the worker?
  *  - with strangers: did the agent say more than the fixed "private line" sentence?
  * If anything is flagged, the owner gets one text. Code words are blanked out
@@ -119,8 +119,8 @@ export async function handleWatchdog(req: Request, deps: Deps): Promise<Response
     if (p >= WATCH_CUTOFF) {
       flagged.push(
         person
-          ? `${nyTime(c.created_at)} ${kind} with ${person.name}: Opus didn't hand a request to the worker.`
-          : `${nyTime(c.created_at)} ${kind} from an unknown number: Opus said more than the private-line reply.`,
+          ? `${nyTime(c.created_at)} ${kind} with ${person.name}: ${deps.config.assistantName} didn't hand a request to the worker.`
+          : `${nyTime(c.created_at)} ${kind} from an unknown number: ${deps.config.assistantName} said more than the private-line reply.`,
       );
     }
   }
@@ -131,7 +131,7 @@ export async function handleWatchdog(req: Request, deps: Deps): Promise<Response
     const lines = flagged.slice(0, 5);
     if (flagged.length > 5) lines.push(`…and ${flagged.length - 5} more.`);
     if (unchecked) lines.push(`${unchecked} conversation(s) couldn't be checked.`);
-    const text = `Opus daily check: ${flagged.length ? "something needs a look" : "partly done"}.\n${lines.join("\n")}`;
+    const text = `${deps.config.assistantName} daily check: ${flagged.length ? "something needs a look" : "partly done"}.\n${lines.join("\n")}`;
     try {
       await sendText(deps.config.telnyx, owner.phone, text.slice(0, 900), deps.fetchImpl);
     } catch (err) {

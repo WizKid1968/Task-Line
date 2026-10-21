@@ -113,7 +113,7 @@ export async function handleInit(req: Request, deps: Deps): Promise<Response> {
       caller_role: person.role,
       caller_name: person.name,
       code_word_required: needsCodeWord ? "yes" : "no",
-      role_instructions: memberInstructions(person),
+      role_instructions: memberInstructions(person, deps.config.assistantName),
     },
     encrypted_dynamic_variables: {
       session_token: encryptForTelnyx(token, deps.config.telnyxEncryptionKey),

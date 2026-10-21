@@ -4,6 +4,7 @@
 // Usage:
 //   SERVER_URL=https://<your-vercel-app>.vercel.app \
 //   TELNYX_ENCRYPTION_KEY=<same value as in Vercel> \
+//   [ASSISTANT_NAME=Opus] [TELNYX_ASSISTANT_NAME="Task-Line Agent"] \
 //   [TELNYX_API_KEY=<key>] node scripts/configure-assistant.mjs [--dry-run] [--skip-secret] [--keep-conversations]
 //
 // TELNYX_API_KEY can be left out where a proxy adds the key automatically.
@@ -15,7 +16,9 @@ import { readFileSync } from "node:fs";
 // everyone as a stranger. Kept in sync with src/agentInstructions.ts by a test.
 const strangerInstructions = readFileSync(new URL("../assistant/stranger-instructions.txt", import.meta.url), "utf8").trim();
 
-const ASSISTANT_NAME = "Task-Line Agent";
+// The record name in Telnyx (how the script finds it again) and the name callers hear.
+const ASSISTANT_NAME = process.env.TELNYX_ASSISTANT_NAME || "Task-Line Agent";
+const SPOKEN_NAME = process.env.ASSISTANT_NAME || "Opus";
 const ENC_SECRET_ID = "task_line_enc_key";
 const API = "https://api.telnyx.com/v2";
 
@@ -68,7 +71,7 @@ function webhookTool(name, description, path, properties, required) {
 const assistant = {
   name: ASSISTANT_NAME,
   model: "anthropic/claude-haiku-4-5",
-  instructions: readFileSync(new URL("../assistant/instructions.md", import.meta.url), "utf8"),
+  instructions: readFileSync(new URL("../assistant/instructions.md", import.meta.url), "utf8").replaceAll("%ASSISTANT_NAME%", SPOKEN_NAME),
   enabled_features: ["telephony", "messaging"],
   // A text conversation that goes quiet for 30 minutes starts fresh next time,
   // so one stuck exchange can't silence the agent for good.
@@ -107,7 +110,7 @@ const assistant = {
     ),
     webhookTool(
       "find_contact",
-      "Look up a saved contact's phone number by name (Rudy, the trusted person, or anyone saved with save_contact). No approval needed.",
+      "Look up a saved contact's phone number by name (the owner, the trusted person, or anyone saved with save_contact). No approval needed.",
       "/api/tools/find-contact",
       { name: { type: "string", description: "The contact's name as the caller said it." } },
       ["name"],
