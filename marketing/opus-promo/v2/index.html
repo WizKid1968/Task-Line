@@ -7,153 +7,145 @@
     <script src="assets/vendor/gsap.min.js"></script>
     <style>
       * { margin: 0; padding: 0; box-sizing: border-box; }
-      html, body { width: 1080px; height: 1920px; overflow: hidden; background: #f4f1ea; }
+      html, body { width: 1080px; height: 1920px; overflow: hidden; background: #f2f0ea; }
       :root {
-        --cream: #f4f1ea; --ink: #121214; --black: #0e0e10; --cobalt: #2d5bff; --cobalt-deep: #1b3fd1;
-        --yellow: #ffe14d; --mint: #8eebc6; --lilac: #cdbcff; --orange: #ff9a52; --sky: #9cc2ff; --pink: #ffb8cc; --lime: #d4f56b;
-        --grey-bubble: #e9e9ee; --green: #0e9f5f;
-        --sans: "Space Grotesk", sans-serif; --serif: "Instrument Serif", serif; --mono: "JetBrains Mono", monospace;
+        --paper: #f2f0ea; --ink: #121214; --cobalt: #2d5bff;
+        --yellow: #ffd640; --mint: #7fe3b8; --lilac: #c4b5fd; --orange: #ff8a3d; --sky: #8fb4ff; --pink: #ffadc6; --lime: #cdf26b;
+        --green: #0e9f5f; --grey: #e8e8ec;
+        --sans: "Inter Tight", sans-serif; --serif: "Instrument Serif", serif; --mono: "JetBrains Mono", monospace;
       }
       #root { position: relative; width: 100%; height: 100%; overflow: hidden; font-family: var(--sans); color: var(--ink); }
       .scene { position: absolute; inset: 0; overflow: hidden; }
       .fill { position: absolute; inset: 0; }
-      .label { position: absolute; left: 72px; top: 150px; font-family: var(--mono); font-size: 26px; letter-spacing: 0.04em; opacity: 0.7; }
-      .brand { position: absolute; right: 72px; top: 150px; font-family: var(--mono); font-size: 26px; letter-spacing: 0.12em; opacity: 0.7; }
+      img.px { image-rendering: pixelated; display: block; }
+      .label { position: absolute; left: 72px; top: 132px; font-family: var(--mono); font-size: 28px; letter-spacing: 0.02em; opacity: 0.75; }
       .w { display: inline-block; }
       .it { font-family: var(--serif); font-style: italic; font-weight: 400; letter-spacing: -0.01em; }
-      .hl { display: inline-block; background: var(--cobalt); color: #fff; padding: 0 18px 6px; border-radius: 6px; }
-      .hl-y { display: inline-block; background: var(--yellow); color: var(--ink); padding: 0 16px 6px; border-radius: 6px; }
-      .head { position: absolute; left: 72px; right: 72px; font-weight: 700; letter-spacing: -0.04em; line-height: 1.02; }
-      .ring { position: absolute; border-radius: 50%; border: 22px solid var(--cobalt); }
-      .ring.sm { width: 90px; height: 90px; border-width: 18px; }
-      .ring.xs { width: 58px; height: 58px; border-width: 12px; }
-      .mascot { position: absolute; display: block; }
-      .grain { position: absolute; inset: -50%; opacity: 0.06; background-image: radial-gradient(rgba(0,0,0,0.9) 1px, transparent 1.2px); background-size: 6px 6px; pointer-events: none; }
-
-      /* chat bubbles */
-      .bubble { display: block; max-width: 760px; padding: 26px 34px; border-radius: 40px; font-size: 44px; line-height: 1.2; font-weight: 500; letter-spacing: -0.01em; }
-      .bubble.them { background: var(--grey-bubble); color: var(--ink); border-bottom-left-radius: 12px; }
-      .bubble.me { background: var(--cobalt); color: #fff; border-bottom-right-radius: 12px; }
+      .hl { display: inline-block; background: var(--cobalt); color: #fff; padding: 0 16px 8px; }
+      .hl.ink { background: var(--ink); }
+      .hl.yel { background: var(--yellow); color: var(--ink); }
+      .head { position: absolute; left: 72px; right: 72px; font-weight: 500; letter-spacing: -0.045em; line-height: 1.0; }
+      .coin { position: absolute; width: 120px; height: 120px; }
+      .coin.sm { width: 84px; height: 84px; }
+      .card { background: #fff; border: 5px solid var(--ink); border-radius: 22px; box-shadow: 12px 12px 0 var(--ink); }
+      /* running timecode, top right */
+      #tc { position: absolute; right: 72px; top: 132px; font-family: var(--mono); font-size: 28px; letter-spacing: 0.04em; opacity: 0.75; }
+      #tc .d { position: absolute; right: 0; top: 0; white-space: nowrap; opacity: 0; }
 
       /* S1 */
-      #s1 .fill { background: var(--black); }
+      #s1 .fill { background: var(--ink); }
       #s1-wrap { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
-      #s1-bubble { font-size: 96px; padding: 34px 64px; border-radius: 70px; border-bottom-left-radius: 18px; }
-      #s1-typing { position: absolute; display: flex; gap: 16px; padding: 36px 44px; border-radius: 60px; background: #2a2a30; }
-      #s1-typing i { display: block; width: 22px; height: 22px; border-radius: 50%; background: #8a8a93; }
+      #s1-bubble { display: block; background: var(--cobalt); color: #fff; font-size: 104px; font-weight: 500; letter-spacing: -0.03em; padding: 34px 66px 44px; border-radius: 80px; border-bottom-right-radius: 18px; }
+      #s1-typing { position: absolute; display: flex; gap: 18px; padding: 40px 50px; border-radius: 70px; background: #2a2a30; }
+      #s1-typing i { display: block; width: 24px; height: 24px; border-radius: 50%; background: #8a8a93; }
 
-      /* S2 */
-      #s2 .fill { background: var(--cream); }
-      #s2-mascot { left: 190px; top: 330px; width: 700px; height: 700px; }
-      #s2-head { top: 1170px; font-size: 140px; text-align: center; }
+      /* S2: mascot huge, cropped */
+      #s2 .fill { background: var(--paper); }
+      #s2-head { top: 300px; font-size: 150px; }
+      #s2-m { position: absolute; left: 140px; top: 760px; width: 1150px; height: 1150px; }
 
       /* S3 */
-      #s3 .fill { background: var(--black); }
-      #s3, #s3 .label, #s3 .brand { color: #fff; }
-      #s3-h1 { top: 420px; font-size: 170px; }
-      #s3-acro { position: absolute; left: 72px; top: 690px; font-family: var(--mono); font-size: 36px; color: #b9b9c4; letter-spacing: 0.02em; }
-      #s3-acro b { color: var(--cobalt); font-weight: 700; font-size: 44px; }
-      #s3-h2 { top: 900px; font-size: 104px; font-weight: 600; }
-      #s3-h2 .it { color: var(--yellow); }
-      #s3-num { position: absolute; left: 0; right: 0; top: 1330px; display: flex; justify-content: center; }
-      #s3-num div { display: flex; align-items: center; gap: 26px; padding: 34px 56px; border-radius: 999px; background: #1c1c22; border: 3px solid var(--cobalt); box-shadow: 0 0 80px rgba(45,91,255,0.45); font-family: var(--mono); font-size: 62px; font-weight: 700; color: #fff; letter-spacing: 0.04em; }
-      #s3-num i { display: block; width: 26px; height: 26px; border-radius: 50%; background: var(--green); box-shadow: 0 0 24px var(--green); }
+      #s3 .fill { background: var(--ink); }
+      #s3 { color: #fff; }
+      #s3-h1 { top: 300px; font-size: 170px; }
+      #s3-acro { position: absolute; left: 72px; top: 520px; font-family: var(--mono); font-size: 34px; color: #a9a9b4; }
+      #s3-acro b { color: #fff; font-weight: 700; }
+      #s3-h2 { top: 620px; font-size: 76px; color: #fff; letter-spacing: -0.035em; line-height: 1.05; }
+      #s3-h2 .hl { padding: 0 12px 6px; }
+      #s3-m { position: absolute; left: 230px; top: 930px; width: 1050px; height: 1050px; }
 
       /* S4 */
       #s4 .fill { background: var(--sky); }
       .s4-row { position: absolute; left: 72px; right: 72px; display: flex; align-items: center; justify-content: space-between; }
-      .s4-row b { display: block; font-size: 118px; font-weight: 700; letter-spacing: -0.04em; }
-      #s4-r1 { top: 360px; } #s4-r2 { top: 660px; } #s4-r3 { top: 980px; flex-direction: column; align-items: flex-start; gap: 60px; }
+      .s4-row > b { display: block; font-size: 128px; font-weight: 500; letter-spacing: -0.045em; }
+      #s4-r1 { top: 380px; } #s4-r2 { top: 700px; } #s4-r3 { top: 1040px; flex-direction: column; align-items: flex-start; gap: 64px; }
       .s4-thing { position: relative; display: block; }
-      .appicon { width: 210px; height: 210px; border-radius: 52px; background: linear-gradient(160deg, #ffffff, #e2e8ff); box-shadow: 0 18px 40px rgba(18,18,20,0.18); display: flex; align-items: center; justify-content: center; }
-      .appicon svg { width: 110px; height: 110px; stroke: var(--cobalt); fill: none; stroke-width: 7; stroke-linecap: round; stroke-linejoin: round; }
-      .loginbox { width: 380px; height: 120px; border-radius: 26px; background: #fff; box-shadow: 0 18px 40px rgba(18,18,20,0.15); display: flex; align-items: center; padding: 0 34px; font-family: var(--mono); font-size: 54px; color: #444; letter-spacing: 0.2em; }
-      .strike { position: absolute; left: -24px; right: -24px; top: 50%; height: 16px; margin-top: -8px; background: #ff3b30; border-radius: 8px; transform-origin: 0 50%; }
+      .appicon { width: 220px; height: 220px; display: flex; align-items: center; justify-content: center; }
+      .appicon svg { width: 116px; height: 116px; stroke: var(--ink); fill: none; stroke-width: 7; stroke-linecap: round; stroke-linejoin: round; }
+      .loginbox { width: 390px; height: 130px; display: flex; align-items: center; padding: 0 36px; font-family: var(--mono); font-size: 56px; letter-spacing: 0.2em; }
+      .strike { position: absolute; left: -30px; right: -30px; top: 50%; height: 18px; margin-top: -9px; background: #ff3b30; border: 4px solid var(--ink); border-radius: 9px; transform-origin: 0 50%; }
       #s4-btns { display: flex; gap: 36px; }
-      .pill { display: flex; align-items: center; gap: 22px; padding: 34px 56px; border-radius: 999px; font-size: 56px; font-weight: 700; }
+      .pill { display: flex; align-items: center; gap: 22px; padding: 34px 58px; border-radius: 999px; font-size: 60px; font-weight: 600; border: 5px solid var(--ink); box-shadow: 10px 10px 0 var(--ink); }
       .pill svg { width: 58px; height: 58px; fill: none; stroke: currentColor; stroke-width: 6; stroke-linecap: round; stroke-linejoin: round; }
-      .pill.call { background: var(--green); color: #fff; }
+      .pill.call { background: var(--mint); }
       .pill.text { background: var(--cobalt); color: #fff; }
 
       /* S5 montage cards */
-      .card .head { top: 250px; font-size: 104px; }
-      .req { position: absolute; left: 72px; top: 520px; }
-      .who { display: flex; align-items: center; gap: 16px; margin: 0 0 14px 8px; font-family: var(--mono); font-size: 26px; opacity: 0.75; }
-      .who i { display: block; width: 44px; height: 44px; border-radius: 50%; background: var(--ink); color: #fff; font-style: normal; font-family: var(--sans); font-weight: 700; font-size: 22px; line-height: 44px; text-align: center; }
-      .orb { position: absolute; left: 430px; top: 790px; width: 220px; height: 220px; }
-      .orb .ring { inset: 0; border-width: 30px; }
-      .result { position: absolute; left: 90px; right: 90px; top: 1050px; background: #fff; border-radius: 36px; box-shadow: 0 30px 60px rgba(18,18,20,0.18); padding: 40px 44px; }
-      .result h4 { font-size: 46px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 18px; }
-      .result .sub { font-family: var(--mono); font-size: 26px; color: #6b6b75; margin-bottom: 22px; }
-      .tick { display: flex; align-items: center; gap: 18px; font-size: 36px; padding: 12px 0; border-top: 2px solid #f0f0f3; }
-      .tick b { display: block; width: 44px; height: 44px; border-radius: 50%; background: var(--green); color: #fff; text-align: center; line-height: 44px; font-size: 28px; }
-      .chip { display: inline-block; padding: 10px 22px; border-radius: 999px; background: #e9fbf2; color: #0b8a54; font-family: var(--mono); font-size: 26px; font-weight: 700; }
-      .browser { border-radius: 22px; overflow: hidden; border: 3px solid #ececf1; }
-      .browser .bar { height: 54px; background: #f3f3f6; display: flex; align-items: center; gap: 12px; padding: 0 20px; font-family: var(--mono); font-size: 22px; color: #777; }
-      .browser .bar i { display: block; width: 14px; height: 14px; border-radius: 50%; background: #d4d4dc; }
-      .site { background: #111; color: #fff; padding: 44px 40px; }
-      .site h5 { font-size: 58px; font-weight: 700; letter-spacing: -0.03em; line-height: 1.02; }
-      .slots { display: flex; gap: 14px; margin-top: 26px; }
-      .slots span { display: block; padding: 12px 20px; border-radius: 14px; background: #fff; color: #111; font-family: var(--mono); font-size: 24px; font-weight: 700; }
+      .mc .head { top: 230px; font-size: 118px; }
+      .mc .req { position: absolute; left: 72px; top: 560px; width: 760px; padding: 26px 32px; }
+      .who { display: flex; align-items: center; gap: 16px; font-family: var(--mono); font-size: 26px; margin-bottom: 12px; color: #55555f; }
+      .who i { display: block; width: 46px; height: 46px; border-radius: 50%; background: var(--ink); color: #fff; font-style: normal; font-family: var(--sans); font-weight: 600; font-size: 24px; line-height: 46px; text-align: center; }
+      .req p { font-size: 46px; font-weight: 500; letter-spacing: -0.02em; line-height: 1.15; }
+      .mc .result { position: absolute; left: 140px; right: 72px; top: 900px; padding: 40px 44px; }
+      .result h4 { font-size: 50px; font-weight: 600; letter-spacing: -0.03em; margin-bottom: 14px; }
+      .sub { font-family: var(--mono); font-size: 26px; color: #6b6b75; margin-bottom: 20px; }
+      .tick { display: flex; align-items: center; gap: 18px; font-size: 38px; padding: 14px 0; border-top: 3px solid #efeff3; }
+      .tick b { display: block; width: 46px; height: 46px; border-radius: 50%; background: var(--green); color: #fff; text-align: center; line-height: 46px; font-size: 28px; }
+      .chip { display: inline-block; padding: 10px 22px; border-radius: 999px; background: var(--ink); color: #fff; font-family: var(--mono); font-size: 26px; font-weight: 700; }
+      .browser .bar { height: 56px; border-bottom: 4px solid var(--ink); display: flex; align-items: center; gap: 12px; padding: 0 20px; font-family: var(--mono); font-size: 24px; }
+      .browser .bar i { display: block; width: 16px; height: 16px; border-radius: 50%; border: 3px solid var(--ink); }
+      .site { background: var(--ink); color: #fff; padding: 44px 40px 40px; border-radius: 0 0 16px 16px; }
+      .site h5 { font-size: 62px; font-weight: 600; letter-spacing: -0.04em; line-height: 1.0; }
+      .slots { display: flex; gap: 14px; margin-top: 28px; }
+      .slots span { display: block; padding: 12px 20px; border-radius: 12px; background: #fff; color: var(--ink); font-family: var(--mono); font-size: 26px; font-weight: 700; }
       .slots span.on { background: var(--yellow); }
-      .bars { display: flex; align-items: flex-end; gap: 22px; height: 300px; padding-top: 10px; }
+      .bars { display: flex; align-items: flex-end; gap: 22px; height: 320px; }
       .bars div { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 10px; height: 100%; }
-      .bars u { display: block; width: 100%; border-radius: 14px 14px 4px 4px; background: #d9dbe6; transform-origin: 50% 100%; text-decoration: none; }
+      .bars u { display: block; width: 100%; border: 4px solid var(--ink); border-radius: 10px 10px 0 0; background: #fff; transform-origin: 50% 100%; text-decoration: none; }
       .bars div.you u { background: var(--cobalt); }
-      .bars em { font-family: var(--mono); font-style: normal; font-size: 22px; color: #6b6b75; }
-      .line { display: block; height: 18px; border-radius: 9px; background: #ececf1; margin: 14px 0; }
-      .house { height: 230px; border-radius: 22px; background: linear-gradient(180deg, #bfe0ff 0%, #e8f4ff 60%, #b9e3a0 60%, #9fd585 100%); position: relative; overflow: hidden; margin-bottom: 22px; }
-      .house .body { position: absolute; left: 330px; bottom: 34px; width: 240px; height: 120px; background: #fff7ec; border: 4px solid #333; }
-      .house .roof { position: absolute; left: 310px; bottom: 150px; width: 0; height: 0; border-left: 140px solid transparent; border-right: 140px solid transparent; border-bottom: 90px solid #e0564a; }
-      .house .door { position: absolute; left: 430px; bottom: 34px; width: 46px; height: 74px; background: #2d5bff; }
-      .price { font-size: 52px; font-weight: 700; letter-spacing: -0.03em; }
-      .player { height: 420px; border-radius: 26px; background: linear-gradient(160deg, #ffd08a, #ff9a52); position: relative; overflow: hidden; }
-      .croissant { position: absolute; left: 50%; top: 46%; width: 300px; height: 160px; margin: -80px 0 0 -150px; border-radius: 150px 150px 70px 70px; background: linear-gradient(180deg, #f6c46b, #c97b26); box-shadow: inset 0 -16px 0 rgba(0,0,0,0.12); }
-      .player .caption { position: absolute; left: 34px; bottom: 74px; font-size: 52px; font-weight: 700; color: #fff; letter-spacing: -0.03em; text-shadow: 0 4px 20px rgba(0,0,0,0.25); }
-      .progress { position: absolute; left: 34px; right: 34px; bottom: 34px; height: 12px; border-radius: 6px; background: rgba(255,255,255,0.45); overflow: hidden; }
-      .progress u { display: block; height: 100%; width: 100%; background: #fff; transform-origin: 0 50%; text-decoration: none; }
-      .badge { position: absolute; left: 60px; top: 1620px; width: 150px; height: 150px; border-radius: 50%; background: #fff; border: 5px solid var(--ink); overflow: hidden; }
-      .badge img { position: absolute; left: -12px; top: -2px; width: 174px; height: 174px; }
+      .bars em { font-family: var(--mono); font-style: normal; font-size: 24px; }
+      .line { display: block; height: 20px; border-radius: 10px; background: #ececf1; margin: 16px 0; transform-origin: 0 50%; }
+      .house { height: 240px; border: 4px solid var(--ink); border-radius: 16px; background: linear-gradient(180deg, #cfe3ff 0%, #eef5ff 62%, var(--mint) 62%); position: relative; overflow: hidden; margin-bottom: 22px; }
+      .house .body { position: absolute; left: 300px; bottom: 30px; width: 250px; height: 124px; background: #fff; border: 5px solid var(--ink); }
+      .house .roof { position: absolute; left: 280px; bottom: 150px; width: 0; height: 0; border-left: 145px solid transparent; border-right: 145px solid transparent; border-bottom: 92px solid var(--orange); }
+      .house .door { position: absolute; left: 405px; bottom: 30px; width: 48px; height: 78px; background: var(--cobalt); border: 4px solid var(--ink); }
+      .price { font-size: 54px; font-weight: 600; letter-spacing: -0.04em; }
+      .player { height: 440px; border-radius: 16px; background: var(--paper); position: relative; overflow: hidden; border: 4px solid var(--ink); }
+      .player img { position: absolute; left: 50%; top: 40px; width: 340px; height: 340px; margin-left: -170px; }
+      .player .cap { position: absolute; left: 30px; bottom: 64px; font-size: 54px; font-weight: 600; color: var(--ink); letter-spacing: -0.04em; }
+      .progress { position: absolute; left: 30px; right: 30px; bottom: 28px; height: 14px; border-radius: 7px; background: rgba(18,18,20,0.15); overflow: hidden; }
+      .progress u { display: block; height: 100%; width: 100%; background: var(--orange); transform-origin: 0 50%; text-decoration: none; }
+      .mc .coin { left: 860px; top: 650px; }
+      #badge { position: absolute; left: 60px; top: 1600px; width: 190px; height: 190px; border-radius: 50%; background: #fff; border: 5px solid var(--ink); overflow: hidden; }
+      #badge img { position: absolute; left: -130px; top: -48px; width: 450px; height: 450px; }
 
       /* S6 wall */
       #s6 .fill { background: var(--lilac); }
-      #s6-wall { position: absolute; inset: 0; }
-      .mini { position: absolute; padding: 18px 28px; border-radius: 30px; border-bottom-left-radius: 8px; background: #fff; font-size: 31px; font-weight: 500; white-space: nowrap; box-shadow: 0 10px 24px rgba(18,18,20,0.12); }
-      #s6-orb { position: absolute; left: 390px; top: 810px; width: 300px; height: 300px; }
-      #s6-orb .ring { inset: 0; border-width: 42px; }
-      #s6-cap { position: absolute; left: 60px; right: 60px; top: 1360px; text-align: center; }
-      #s6-cap span.box { display: inline-block; background: var(--ink); color: #fff; padding: 22px 34px 28px; border-radius: 22px; font-size: 76px; font-weight: 700; letter-spacing: -0.03em; line-height: 1.08; }
+      .mini { position: absolute; padding: 16px 26px; font-size: 32px; font-weight: 500; white-space: nowrap; border: 4px solid var(--ink); border-radius: 18px; background: #fff; box-shadow: 7px 7px 0 var(--ink); }
+      #s6-cap { position: absolute; left: 72px; right: 72px; top: 980px; font-size: 92px; font-weight: 500; letter-spacing: -0.045em; line-height: 1.0; }
+      #s6-m { position: absolute; left: 90px; top: 1150px; width: 900px; height: 900px; }
 
       /* S7 */
       #s7 .fill { background: var(--mint); }
-      #s7-head { top: 250px; font-size: 100px; }
-      #s7-phone { position: absolute; left: 140px; top: 640px; width: 800px; height: 1060px; border-radius: 80px; background: #fff; border: 12px solid var(--ink); padding: 120px 44px 40px; display: flex; flex-direction: column; gap: 28px; }
-      #s7-phone .notch { position: absolute; left: 50%; top: 26px; width: 200px; height: 44px; margin-left: -100px; border-radius: 22px; background: var(--ink); }
-      #s7-phone .bubble { font-size: 38px; max-width: 600px; }
-      #s7-phone .me { align-self: flex-end; }
-      #s7-phone .them { align-self: flex-start; }
-      #s7-phone .them small { display: block; font-family: var(--mono); font-size: 22px; color: var(--cobalt); margin-bottom: 8px; letter-spacing: 0.1em; }
-      #s7-sent { align-self: flex-start; display: flex; align-items: center; gap: 16px; padding: 18px 30px; border-radius: 999px; background: #e9fbf2; color: #0b8a54; font-size: 38px; font-weight: 700; }
-      #s7-sent b { display: block; width: 46px; height: 46px; border-radius: 50%; background: var(--green); color: #fff; text-align: center; line-height: 46px; font-size: 28px; }
+      #s7-head { top: 230px; font-size: 100px; }
+      #s7-phone { position: absolute; left: 130px; top: 620px; width: 820px; height: 1120px; border-radius: 84px; background: #fff; border: 6px solid var(--ink); box-shadow: 16px 16px 0 var(--ink); padding: 120px 44px 40px; display: flex; flex-direction: column; gap: 28px; }
+      #s7-phone .notch { position: absolute; left: 50%; top: 30px; width: 200px; height: 46px; margin-left: -100px; border-radius: 23px; background: var(--ink); }
+      .bub { display: block; max-width: 610px; padding: 24px 32px; border-radius: 38px; font-size: 39px; line-height: 1.2; font-weight: 500; letter-spacing: -0.01em; }
+      .bub.me { align-self: flex-end; background: var(--cobalt); color: #fff; border-bottom-right-radius: 10px; }
+      .bub.op { align-self: flex-start; background: var(--grey); border-bottom-left-radius: 10px; }
+      .bub.op small { display: block; font-family: var(--mono); font-size: 22px; color: var(--cobalt); margin-bottom: 8px; letter-spacing: 0.1em; font-weight: 700; }
+      #s7-sent { align-self: flex-start; display: flex; align-items: center; gap: 16px; padding: 18px 30px; border-radius: 999px; background: var(--ink); color: #fff; font-size: 38px; font-weight: 600; }
+      #s7-sent b { display: block; width: 46px; height: 46px; border-radius: 50%; background: var(--green); text-align: center; line-height: 46px; font-size: 28px; }
 
       /* S8 */
       #s8 .fill { background: var(--cobalt); }
-      #s8-ring { position: absolute; left: 40px; top: 460px; width: 1000px; height: 1000px; border-radius: 50%; border: 80px solid #fff; }
-      #s8-head { top: 690px; font-size: 104px; color: #fff; text-align: center; line-height: 1.06; }
-      #s8-head .it { color: var(--yellow); }
+      #s8-ring { position: absolute; left: 60px; top: 470px; width: 960px; height: 960px; }
+      #s8-head { top: 300px; font-size: 128px; color: #fff; }
+      #s8-head .hl { background: var(--ink); }
+      #s8-head2 { top: 1480px; font-size: 128px; color: #fff; text-align: right; }
 
       /* S9 */
-      #s9 .fill { background: var(--cream); }
-      #s9-mascot { left: 300px; top: 230px; width: 480px; height: 480px; }
-      #s9-word { position: absolute; left: 0; right: 0; top: 760px; display: flex; justify-content: center; align-items: center; gap: 6px; font-weight: 700; font-size: 210px; letter-spacing: -0.05em; }
-      #s9-word .o { display: block; width: 172px; height: 172px; border-radius: 50%; border: 40px solid var(--cobalt); margin-right: 8px; }
-      #s9-acro { position: absolute; left: 0; right: 0; top: 1010px; text-align: center; font-family: var(--mono); font-size: 30px; letter-spacing: 0.08em; color: #55555f; }
-      #s9-acro b { color: var(--cobalt); }
-      #s9-tag { position: absolute; left: 0; right: 0; top: 1090px; text-align: center; font-size: 110px; font-weight: 700; letter-spacing: -0.04em; }
+      #s9 .fill { background: var(--paper); }
+      #s9-m { position: absolute; left: 270px; top: 200px; width: 540px; height: 540px; }
+      #s9-word { position: absolute; left: 0; right: 0; top: 760px; display: flex; justify-content: center; align-items: center; font-weight: 600; font-size: 230px; letter-spacing: -0.06em; line-height: 1; }
+      #s9-word img { width: 210px; height: 210px; margin-right: 4px; }
+      #s9-acro { position: absolute; left: 0; right: 0; top: 1010px; text-align: center; font-family: var(--mono); font-size: 30px; letter-spacing: 0.06em; color: #55555f; }
+      #s9-acro b { color: var(--ink); }
+      #s9-tag { position: absolute; left: 0; right: 0; top: 1085px; text-align: center; font-size: 116px; font-weight: 500; letter-spacing: -0.045em; }
       #s9-btnrow { position: absolute; left: 0; right: 0; top: 1290px; display: flex; justify-content: center; }
-      #s9-btn { display: block; padding: 38px 80px; border-radius: 999px; background: var(--cobalt); color: #fff; font-size: 58px; font-weight: 700; letter-spacing: -0.02em; box-shadow: 0 20px 40px rgba(45,91,255,0.35); }
-      #s9-url { position: absolute; left: 0; right: 0; top: 1470px; text-align: center; font-family: var(--mono); font-size: 52px; font-weight: 700; letter-spacing: 0.08em; }
-      #s9-small { position: absolute; left: 0; right: 0; top: 1560px; text-align: center; font-family: var(--mono); font-size: 26px; color: #6b6b75; letter-spacing: 0.06em; }
+      #s9-btn { display: block; padding: 36px 80px 40px; border-radius: 999px; background: var(--cobalt); color: #fff; font-size: 60px; font-weight: 600; letter-spacing: -0.03em; border: 6px solid var(--ink); box-shadow: 12px 12px 0 var(--ink); }
+      #s9-url { position: absolute; left: 0; right: 0; top: 1490px; text-align: center; font-family: var(--mono); font-size: 54px; font-weight: 700; letter-spacing: 0.08em; }
+      #s9-small { position: absolute; left: 0; right: 0; top: 1580px; text-align: center; font-family: var(--mono); font-size: 26px; color: #6b6b75; }
     </style>
   </head>
   <body>
@@ -162,56 +154,44 @@
       <!-- S1 "hey" 0-3 -->
       <section id="s1" class="scene clip" data-start="0" data-duration="3" data-track-index="1">
         <div class="fill"></div>
-        <div class="label" style="color:#fff">// 00 · one text</div>
-        <div id="s1-wrap">
-          <div id="s1-typing"><i></i><i></i><i></i></div>
-          <div id="s1-bubble" class="bubble me">hey</div>
-        </div>
+        <div class="label" style="color:#fff">// one text</div>
+        <div id="s1-wrap"><div id="s1-typing"><i></i><i></i><i></i></div><div id="s1-bubble">hey</div></div>
       </section>
 
       <!-- S2 mascot 3-6.5 -->
       <section id="s2" class="scene clip" data-start="3" data-duration="3.5" data-track-index="1">
         <div class="fill"></div>
-        <div class="grain"></div>
-        <div class="label">// 01 · that's it</div><div class="brand">OPUS</div>
-        <div class="ring sm" id="s2-d1" style="left:110px;top:420px"></div>
-        <div class="ring xs" id="s2-d2" style="left:880px;top:330px"></div>
-        <div class="ring xs" id="s2-d3" style="left:860px;top:960px"></div>
-        <img class="mascot" id="s2-mascot" src="assets/mascot/wave.png" alt="" />
-        <div class="head" id="s2-head"><span class="w" data-t="3.40">That's</span> <span class="w" data-t="3.58">all</span><br /><span class="w it" data-t="3.74">it</span> <span class="w it" data-t="3.88">takes.</span></div>
+        <div class="label">// 01 · that's it</div>
+        <img class="coin px" id="s2-c1" src="assets/objects/ring.png" style="left:820px;top:560px" alt="" />
+        <img class="coin sm px" id="s2-c2" src="assets/objects/ring.png" style="left:110px;top:1240px" alt="" />
+        <div class="head" id="s2-head"><span class="w" data-t="3.40">That's</span> <span class="w" data-t="3.58">all</span><br /><span class="w" data-t="3.74">it</span> <span class="w hl" data-t="3.88">takes.</span></div>
+        <img class="px" id="s2-m" src="assets/mascot/wave.png" alt="" />
       </section>
 
       <!-- S3 meet Opus 6.5-11 -->
       <section id="s3" class="scene clip" data-start="6.5" data-duration="4.5" data-track-index="1">
         <div class="fill"></div>
-        <div class="label">// 02 · meet opus</div><div class="brand">OPUS</div>
-        <div class="head" id="s3-h1"><span class="w" data-t="6.70">Meet</span> <span class="w hl" data-t="7.05">Opus.</span></div>
-        <div id="s3-acro"><span class="w" data-t="7.35"><b>O</b>mni<b>P</b>otent</span> <span class="w" data-t="7.45"><b>P</b>ersonal</span> <span class="w" data-t="7.55"><b>U</b>tility</span> <span class="w" data-t="7.65"><b>S</b>ystem</span></div>
-        <div class="head" id="s3-h2"><span class="w" data-t="7.68">The</span> <span class="w" data-t="7.84">AI</span> <span class="w" data-t="8.00">assistant</span> <span class="w" data-t="8.38">that</span> <span class="w" data-t="8.52">lives</span> <span class="w" data-t="8.72">in</span> <span class="w" data-t="8.82">a</span> <span class="w it" data-t="8.98">phone</span> <span class="w it" data-t="9.28">number.</span></div>
-        <div id="s3-num"><div class="w" data-t="9.55"><i></i>(555) 010-OPUS</div></div>
+        <div class="label">// 02 · meet opus</div>
+        <div class="head" id="s3-h1"><span class="w" data-t="6.70">Meet</span><br /><span class="w hl" data-t="7.05">Opus.</span></div>
+        <div id="s3-acro"></div>
+        <div class="head" id="s3-h2"><span class="w" data-t="7.68">The</span> <span class="w" data-t="7.84">AI</span> <span class="w" data-t="8.00">assistant</span><br /><span class="w" data-t="8.38">that</span> <span class="w" data-t="8.52">lives</span> <span class="w" data-t="8.72">in</span> <span class="w" data-t="8.82">a</span> <span class="w hl" data-t="8.98">phone number.</span></div>
+        <img class="px" id="s3-m" src="assets/mascot/hold.png" alt="" />
       </section>
 
       <!-- S4 no app 11-15.5 -->
       <section id="s4" class="scene clip" data-start="11" data-duration="4.5" data-track-index="1">
         <div class="fill"></div>
-        <div class="grain"></div>
-        <div class="label">// 03 · nothing to install</div><div class="brand">OPUS</div>
+        <div class="label">// 03 · nothing to install</div>
         <div class="s4-row" id="s4-r1">
           <b class="w" data-t="11.20">No app.</b>
-          <div class="s4-thing w" data-t="11.20" id="s4-app">
-            <div class="appicon"><svg viewBox="0 0 64 64"><path d="M32 10v32M18 30l14 14 14-14M14 54h36" /></svg></div>
-            <div class="strike" id="s4-st1" data-layout-allow-occlusion></div>
-          </div>
+          <div class="s4-thing w" data-t="11.20" id="s4-app"><div class="appicon card"><svg viewBox="0 0 64 64"><path d="M32 10v32M18 30l14 14 14-14M14 54h36" /></svg></div><div class="strike" id="s4-st1" data-layout-allow-occlusion></div></div>
         </div>
         <div class="s4-row" id="s4-r2">
           <b class="w" data-t="12.07">No login.</b>
-          <div class="s4-thing w" data-t="12.07" id="s4-login">
-            <div class="loginbox">••••••</div>
-            <div class="strike" id="s4-st2" data-layout-allow-occlusion></div>
-          </div>
+          <div class="s4-thing w" data-t="12.07" id="s4-login"><div class="loginbox card">••••••</div><div class="strike" id="s4-st2" data-layout-allow-occlusion></div></div>
         </div>
         <div class="s4-row" id="s4-r3">
-          <b><span class="w" data-t="13.24">Just</span> <span class="w" data-t="13.42">call</span> <span class="w" data-t="13.60">it,</span><br /><span class="w" data-t="14.11">or</span> <span class="w it" data-t="14.28">text</span> <span class="w it" data-t="14.46">it.</span></b>
+          <b><span class="w" data-t="13.24">Just</span> <span class="w" data-t="13.42">call</span> <span class="w" data-t="13.60">it,</span><br /><span class="w" data-t="14.11">or</span> <span class="w hl" data-t="14.28">text it.</span></b>
           <div id="s4-btns">
             <div class="pill call w" data-t="13.50"><svg viewBox="0 0 24 24"><path d="M5 3h4l2 5-3 2a12 12 0 0 0 6 6l2-3 5 2v4a2 2 0 0 1-2 2A18 18 0 0 1 3 5a2 2 0 0 1 2-2z" /></svg>Call</div>
             <div class="pill text w" data-t="14.30"><svg viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z" /></svg>Text</div>
@@ -219,92 +199,77 @@
         </div>
       </section>
 
-      <!-- S5 montage: 7 cards, 2.2 s each, 15.5-30.9 -->
-      <section id="c1" class="scene clip card" data-start="15.5" data-duration="2.2" data-track-index="1">
-        <div class="fill" style="background:var(--yellow)"></div>
-        <div class="label">// request 01 · family</div><div class="brand">OPUS</div>
-        <div class="head"><span class="hl">Plan</span> a party.</div>
-        <div class="req"><div class="who"><i>J</i>Mia's mom</div><div class="bubble them">Plan Mia's 7th birthday party</div></div>
-        <div class="orb"><div class="ring"></div></div>
-        <div class="result"><h4>Mia's party is planned</h4><div class="sub">SAT · 2:00 PM · 18 GUESTS</div>
-          <div class="tick"><b>✓</b>Party venue found</div><div class="tick"><b>✓</b>Invites written</div><div class="tick"><b>✓</b>Unicorn cake ideas</div></div>
+      <!-- S5 montage: 7 cards x 2.2 s, 15.5-30.9 -->
+      <section id="c1" class="scene clip mc" data-start="15.5" data-duration="2.2" data-track-index="1">
+        <div class="fill" style="background:var(--yellow)"></div><div class="label">// request 01 · family</div>
+        <div class="head"><span class="hl ink">Plan</span> a party.</div>
+        <div class="req card"><div class="who"><i>J</i>Mia's mom</div><p>Plan Mia's 7th birthday party</p></div>
+        <img class="coin px" src="assets/objects/ring.png" alt="" />
+        <div class="result card"><h4>Mia's party is planned</h4><div class="sub">SAT · 2:00 PM · 18 GUESTS</div><div class="tick"><b>✓</b>Venue found</div><div class="tick"><b>✓</b>Invites written</div></div>
       </section>
-      <section id="c2" class="scene clip card" data-start="17.7" data-duration="2.2" data-track-index="1">
-        <div class="fill" style="background:var(--orange)"></div>
-        <div class="label">// request 02 · small business</div><div class="brand">OPUS</div>
-        <div class="head"><span class="hl">Build</span> a website.</div>
-        <div class="req"><div class="who"><i>A</i>Andre · Fade City Barbers</div><div class="bubble them">Build me a booking website</div></div>
-        <div class="orb"><div class="ring"></div></div>
-        <div class="result" style="padding:26px"><div class="browser"><div class="bar"><i></i><i></i><i></i>fadecitybarbers.com</div>
-          <div class="site"><h5>Fresh cuts.<br />Book in seconds.</h5><div class="slots"><span>10:00</span><span class="on">11:30</span><span>1:00</span><span>3:30</span></div></div></div></div>
+      <section id="c2" class="scene clip mc" data-start="17.7" data-duration="2.2" data-track-index="1">
+        <div class="fill" style="background:var(--orange)"></div><div class="label">// request 02 · small business</div>
+        <div class="head"><span class="hl ink">Build</span> a website.</div>
+        <div class="req card"><div class="who"><i>A</i>Andre · Fade City Barbers</div><p>Build me a booking website</p></div>
+        <img class="coin px" src="assets/objects/ring.png" alt="" />
+        <div class="result card browser" style="padding:0"><div class="bar"><i></i><i></i><i></i>fadecitybarbers.com</div><div class="site"><h5>Fresh cuts. Book in seconds.</h5><div class="slots"><span>10:00</span><span class="on">11:30</span><span>1:00</span><span>3:30</span></div></div></div>
       </section>
-      <section id="c3" class="scene clip card" data-start="19.9" data-duration="2.2" data-track-index="1">
-        <div class="fill" style="background:var(--mint)"></div>
-        <div class="label">// request 03 · office</div><div class="brand">OPUS</div>
-        <div class="head"><span class="hl">Order</span> lunch.</div>
-        <div class="req"><div class="who"><i>P</i>Priya · office manager</div><div class="bubble them">Order lunch for the team. 12 people, Thai.</div></div>
-        <div class="orb"><div class="ring"></div></div>
-        <div class="result"><h4>Lunch is on the way</h4><div class="sub">THAI GARDEN · 12 MEALS</div>
-          <div class="tick"><b>✓</b>Order confirmed</div><div class="tick"><b>✓</b>Arriving at 12:30</div><div style="margin-top:16px"><span class="chip">● ON ITS WAY</span></div></div>
+      <section id="c3" class="scene clip mc" data-start="19.9" data-duration="2.2" data-track-index="1">
+        <div class="fill" style="background:var(--mint)"></div><div class="label">// request 03 · office</div>
+        <div class="head"><span class="hl ink">Order</span> lunch.</div>
+        <div class="req card"><div class="who"><i>P</i>Priya · office manager</div><p>Order lunch for the team. 12 people, Thai.</p></div>
+        <img class="coin px" src="assets/objects/ring.png" alt="" />
+        <div class="result card"><h4>Lunch is on the way</h4><div class="sub">THAI GARDEN · 12 MEALS</div><div class="tick"><b>✓</b>Order confirmed</div><div class="tick"><b>✓</b>Arriving 12:30</div></div>
       </section>
-      <section id="c4" class="scene clip card" data-start="22.1" data-duration="2.2" data-track-index="1">
-        <div class="fill" style="background:var(--pink)"></div>
-        <div class="label">// request 04 · school</div><div class="brand">OPUS</div>
-        <div class="head"><span class="hl">Study</span> smarter.</div>
-        <div class="req"><div class="who"><i>J</i>Jordan · student</div><div class="bubble them">Turn my notes into a study guide</div></div>
-        <div class="orb"><div class="ring"></div></div>
-        <div class="result"><h4>Biology 101 · Study guide</h4><div class="sub">3 CHAPTERS · 24 FLASHCARDS</div>
-          <span class="line" style="width:92%"></span><span class="line" style="width:78%"></span><span class="line" style="width:85%"></span><span class="line" style="width:60%"></span></div>
+      <section id="c4" class="scene clip mc" data-start="22.1" data-duration="2.2" data-track-index="1">
+        <div class="fill" style="background:var(--pink)"></div><div class="label">// request 04 · school</div>
+        <div class="head"><span class="hl ink">Study</span> smarter.</div>
+        <div class="req card"><div class="who"><i>J</i>Jordan · student</div><p>Turn my notes into a study guide</p></div>
+        <img class="coin px" src="assets/objects/ring.png" alt="" />
+        <div class="result card"><h4>Biology 101 · Study guide</h4><div class="sub">3 CHAPTERS · 24 FLASHCARDS</div><span class="line" style="width:92%"></span><span class="line" style="width:76%"></span><span class="line" style="width:84%"></span></div>
       </section>
-      <section id="c5" class="scene clip card" data-start="24.3" data-duration="2.2" data-track-index="1">
-        <div class="fill" style="background:var(--sky)"></div>
-        <div class="label">// request 05 · real estate</div><div class="brand">OPUS</div>
-        <div class="head"><span class="hl">Write</span> the listing.</div>
-        <div class="req"><div class="who"><i>D</i>Dana · realtor</div><div class="bubble them">Write the listing for 42 Oak St</div></div>
-        <div class="orb"><div class="ring"></div></div>
-        <div class="result"><div class="house"><div class="roof"></div><div class="body"></div><div class="door"></div></div>
-          <div class="price">42 Oak St · $649,000</div><div class="sub" style="margin:8px 0 0">3 BED · 2 BATH · SUNNY CORNER LOT</div></div>
+      <section id="c5" class="scene clip mc" data-start="24.3" data-duration="2.2" data-track-index="1">
+        <div class="fill" style="background:var(--sky)"></div><div class="label">// request 05 · real estate</div>
+        <div class="head"><span class="hl ink">Write</span> the listing.</div>
+        <div class="req card"><div class="who"><i>D</i>Dana · realtor</div><p>Write the listing for 42 Oak St</p></div>
+        <img class="coin px" src="assets/objects/ring.png" alt="" />
+        <div class="result card"><div class="house"><div class="roof"></div><div class="body"></div><div class="door"></div></div><div class="price">42 Oak St · $649,000</div><div class="sub" style="margin:6px 0 0">3 BED · 2 BATH · CORNER LOT</div></div>
       </section>
-      <section id="c6" class="scene clip card" data-start="26.5" data-duration="2.2" data-track-index="1">
-        <div class="fill" style="background:var(--lime)"></div>
-        <div class="label">// request 06 · startup</div><div class="brand">OPUS</div>
-        <div class="head"><span class="hl">Research</span> the market.</div>
-        <div class="req"><div class="who"><i>S</i>Sam · founder</div><div class="bubble them">Research my top 5 competitors</div></div>
-        <div class="orb"><div class="ring"></div></div>
-        <div class="result"><h4>Market snapshot</h4>
-          <div class="bars"><div><u style="height:62%"></u><em>A</em></div><div><u style="height:80%"></u><em>B</em></div><div class="you"><u style="height:96%"></u><em>YOU</em></div><div><u style="height:48%"></u><em>C</em></div><div><u style="height:70%"></u><em>D</em></div><div><u style="height:38%"></u><em>E</em></div></div></div>
+      <section id="c6" class="scene clip mc" data-start="26.5" data-duration="2.2" data-track-index="1">
+        <div class="fill" style="background:var(--lime)"></div><div class="label">// request 06 · startup</div>
+        <div class="head"><span class="hl ink">Research</span> the market.</div>
+        <div class="req card" style="top:640px"><div class="who"><i>S</i>Sam · founder</div><p>Research my top 5 competitors</p></div>
+        <img class="coin px" src="assets/objects/ring.png" style="top:720px" alt="" />
+        <div class="result card" style="top:960px"><h4>Market snapshot</h4><div class="bars"><div><u style="height:62%"></u><em>A</em></div><div><u style="height:80%"></u><em>B</em></div><div class="you"><u style="height:96%"></u><em>YOU</em></div><div><u style="height:48%"></u><em>C</em></div><div><u style="height:70%"></u><em>D</em></div></div></div>
       </section>
-      <section id="c7" class="scene clip card" data-start="28.7" data-duration="2.2" data-track-index="1">
-        <div class="fill" style="background:var(--lilac)"></div>
-        <div class="label">// request 07 · bakery</div><div class="brand">OPUS</div>
-        <div class="head"><span class="hl">Make</span> the video.</div>
-        <div class="req"><div class="who"><i>L</i>Lena · Lena's Bakery</div><div class="bubble them">Make a promo video for my new croissant</div></div>
-        <div class="orb"><div class="ring"></div></div>
-        <div class="result" style="padding:26px"><div class="player"><div class="croissant"></div><div class="caption">Fresh. Flaky. New.</div><div class="progress"><u id="c7-prog"></u></div></div></div>
+      <section id="c7" class="scene clip mc" data-start="28.7" data-duration="2.2" data-track-index="1">
+        <div class="fill" style="background:var(--lilac)"></div><div class="label">// request 07 · bakery</div>
+        <div class="head"><span class="hl ink">Make</span> the video.</div>
+        <div class="req card"><div class="who"><i>L</i>Lena · Lena's Bakery</div><p>Make a promo video for my new croissant</p></div>
+        <img class="coin px" src="assets/objects/ring.png" alt="" />
+        <div class="result card" style="padding:24px"><div class="player"><img class="px" src="assets/objects/croissant.png" alt="" /><div class="cap">Fresh. Flaky. New.</div><div class="progress"><u id="c7-prog"></u></div></div></div>
       </section>
-      <!-- mascot badge across the montage -->
-      <div id="m-badge" data-layout-allow-overflow class="badge clip" data-start="15.5" data-duration="15.4" data-track-index="3"><img src="assets/mascot/wave.png" alt="" /></div>
+      <div id="badge" data-layout-allow-overflow class="clip" data-start="15.5" data-duration="15.4" data-track-index="3"><img class="px" src="assets/mascot/wave.png" alt="" /></div>
 
-      <!-- S6 the wall 30.9-35 -->
+      <!-- S6 wall 30.9-35: requests pour in, then fly into the mascot's O -->
       <section id="s6" class="scene clip" data-start="30.9" data-duration="4.1" data-track-index="1">
         <div class="fill"></div>
-        <div class="label">// requests · everyone</div><div class="brand">OPUS</div>
+        <div class="label">// requests · everyone</div>
         <div id="s6-wall" data-layout-allow-overlap></div>
-        <div id="s6-orb"><div class="ring"></div></div>
-        <div id="s6-cap"><span class="box"><span class="w" data-t="31.30">Whatever</span> <span class="w" data-t="31.62">you</span> <span class="w" data-t="31.78">need,</span><br /><span class="w" data-t="32.32">whoever</span> <span class="w" data-t="32.66">you</span> <span class="w" data-t="32.82">are.</span></span></div>
+        <div class="head" id="s6-cap"><span class="w" data-t="31.30">Whatever</span> <span class="w" data-t="31.62">you</span> <span class="w" data-t="31.78">need,</span><br /><span class="w" data-t="32.32">whoever</span> <span class="w" data-t="32.66">you</span> <span class="w hl ink" data-t="32.82">are.</span></div>
+        <img class="px" id="s6-m" src="assets/mascot/cheer.png" alt="" />
       </section>
 
       <!-- S7 checks with you 35-40 -->
       <section id="s7" class="scene clip" data-start="35" data-duration="5" data-track-index="1">
         <div class="fill"></div>
-        <div class="grain"></div>
-        <div class="label">// always your call</div><div class="brand">OPUS</div>
-        <div class="head" id="s7-head"><span class="w" data-t="35.55">It</span> <span class="w" data-t="35.68">always</span> <span class="w" data-t="35.95">checks</span> <span class="w" data-t="36.25">with</span> <span class="w" data-t="36.40">you</span> <span class="w it" data-t="36.55">before</span> <span class="w it" data-t="36.85">it</span> <span class="w it" data-t="37.00">acts.</span></div>
+        <div class="label">// always your call</div>
+        <div class="head" id="s7-head"><span class="w" data-t="35.55">It</span> <span class="w" data-t="35.68">always</span> <span class="w" data-t="35.95">checks</span> <span class="w" data-t="36.25">with</span> <span class="w" data-t="36.40">you</span> <span class="w hl ink" data-t="36.55">before it acts.</span></div>
         <div id="s7-phone">
           <div class="notch"></div>
-          <div class="bubble me w" data-t="35.60">Email my landlord about the leak under the sink</div>
-          <div class="bubble them w" data-t="36.60"><small>OPUS</small>Here's the email: "Hi Mark, there's a leak under the kitchen sink. Could someone take a look this week?" Send it?</div>
-          <div class="bubble me w" data-t="37.90">Yes</div>
+          <div class="bub me w" data-t="35.60">Email my landlord about the leak under the sink</div>
+          <div class="bub op w" data-t="36.60"><small>OPUS</small>Here's the email: "Hi Mark, there's a leak under the kitchen sink. Could someone take a look this week?" Send it?</div>
+          <div class="bub me w" data-t="37.90">Yes</div>
           <div id="s7-sent" class="w" data-t="38.50"><b>✓</b>Sent</div>
         </div>
       </section>
@@ -312,42 +277,58 @@
       <!-- S8 say it / do it 40-43 -->
       <section id="s8" class="scene clip" data-start="40" data-duration="3" data-track-index="1">
         <div class="fill"></div>
-        <div class="label" style="color:#fff">// omnipotent</div><div class="brand" style="color:#fff">OPUS</div>
-        <div id="s8-ring"></div>
-        <div class="head" id="s8-head"><span class="w" data-t="40.30">If</span> <span class="w" data-t="40.42">you</span> <span class="w" data-t="40.55">can</span><br /><span class="w it" data-t="40.68">say</span> <span class="w it" data-t="40.86">it,</span><br /><span class="w" data-t="41.02">Opus</span> <span class="w" data-t="41.30">can</span><br /><span class="w it" data-t="41.46">do</span> <span class="w it" data-t="41.64">it.</span></div>
+        <div class="label" style="color:#fff">// omnipotent</div>
+        <img class="px" id="s8-ring" src="assets/objects/ring-big.png" alt="" />
+        <div class="head" id="s8-head"><span class="w" data-t="40.30">If</span> <span class="w" data-t="40.42">you</span> <span class="w" data-t="40.55">can</span><br /><span class="w hl" data-t="40.68">say it,</span></div>
+        <div class="head" id="s8-head2"><span class="w" data-t="41.02">Opus</span> <span class="w" data-t="41.30">can</span><br /><span class="w hl" data-t="41.46">do it.</span></div>
       </section>
 
       <!-- S9 end card 43-50 -->
       <section id="s9" class="scene clip" data-start="43" data-duration="7" data-track-index="1">
         <div class="fill"></div>
-        <div class="grain"></div>
-        <div class="ring sm" id="s9-d1" style="left:120px;top:300px"></div>
-        <div class="ring xs" id="s9-d2" style="left:880px;top:360px"></div>
-        <div class="ring xs" id="s9-d3" style="left:150px;top:1700px"></div>
-        <div class="ring sm" id="s9-d4" style="left:860px;top:1660px"></div>
-        <img class="mascot" id="s9-mascot" src="assets/mascot/thumbs.png" alt="" />
-        <div id="s9-word"><span class="o"></span><span>PUS</span></div>
+        <img class="coin px" id="s9-c1" src="assets/objects/ring.png" style="left:110px;top:330px" alt="" />
+        <img class="coin sm px" id="s9-c2" src="assets/objects/ring.png" style="left:880px;top:420px" alt="" />
+        <img class="coin sm px" id="s9-c3" src="assets/objects/ring.png" style="left:130px;top:1700px" alt="" />
+        <img class="coin px" id="s9-c4" src="assets/objects/ring.png" style="left:860px;top:1670px" alt="" />
+        <img class="px" id="s9-m" src="assets/mascot/wave.png" alt="" />
+        <div id="s9-word"><img class="px" src="assets/objects/ring.png" alt="" /><span>PUS</span></div>
         <div id="s9-acro"><b>O</b>MNI<b>P</b>OTENT <b>P</b>ERSONAL <b>U</b>TILITY <b>S</b>YSTEM</div>
-        <div id="s9-tag"><span class="w" data-t="44.31">Just</span> <span class="w it" data-t="44.50">say it.</span></div>
+        <div id="s9-tag"><span class="w" data-t="44.31">Just</span> <span class="w hl" data-t="44.50">say it.</span></div>
         <div id="s9-btnrow"><div id="s9-btn">Book your setup</div></div>
         <div id="s9-url">GETOPUS.ONLINE</div>
         <div id="s9-small">no app · no login · just a number</div>
       </section>
 
+      <!-- running timecode across the film -->
+      <div id="tc" class="clip" data-start="0" data-duration="50" data-track-index="4"></div>
+
       <audio id="mix" src="assets/audio/mix.wav" data-start="0" data-duration="50" data-track-index="6" data-volume="1"></audio>
     </div>
 
     <script>
-      // Seeded random, so the wall looks the same in every render.
       let seed = 2024;
       const rand = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+
+      // Acronym line (built here to keep the markup short)
+      document.getElementById("s3-acro").innerHTML =
+        '<span class="w" data-t="7.30"><b>O</b>mni<b>P</b>otent</span> <span class="w" data-t="7.40"><b>P</b>ersonal</span> <span class="w" data-t="7.50"><b>U</b>tility</span> <span class="w" data-t="7.60"><b>S</b>ystem</span>';
+
+      // Timecode digits: one element per second, shown in turn (seek-safe).
+      const tc = document.getElementById("tc");
+      for (let s = 0; s < 50; s++) {
+        const d = document.createElement("span");
+        d.className = "d";
+        d.id = "tc" + s;
+        d.textContent = "OPUS  00:00:" + String(s).padStart(2, "0") + ":00";
+        tc.appendChild(d);
+      }
+
+      // The wall of requests
       const wallTexts = [
         "Book a dentist appointment", "Translate this menu", "Find a plumber today", "Draft my wedding toast",
         "Plan a road trip to Austin", "Write a cover letter", "Summarize this contract", "Find a gift for Mom",
-        "Make a logo for my food truck", "Compare these car quotes", "Write my Instagram captions", "Vegan dinner for 6",
-        "Build an invoice template", "Plan my workout week", "Find flights to Rome", "Clean up my inbox",
-        "Make a budget spreadsheet", "Find a babysitter Saturday", "Write a thank-you note", "Turn this into a pitch deck",
-        "Answer my customer emails", "Plan date night", "Get quotes for a new roof", "Schedule my team meeting"
+        "Make a logo for my food truck", "Compare these car quotes", "Write my Instagram posts", "Vegan dinner for 6",
+        "Build an invoice template", "Plan my workout week", "Find flights to Rome", "Clean up my inbox"
       ];
       const wall = document.getElementById("s6-wall");
       const minis = [];
@@ -357,98 +338,102 @@
         el.id = "mini" + i;
         el.textContent = txt;
         const col = i % 2, row = Math.floor(i / 2);
-        // Left column hugs the left edge, right column hugs the right edge.
-        if (col === 0) el.style.left = Math.round(30 + rand() * 60) + "px";
-        else el.style.right = Math.round(30 + rand() * 60) + "px";
-        el.style.top = (230 + row * 96 + rand() * 24) + "px";
+        if (col === 0) el.style.left = Math.round(40 + rand() * 50) + "px";
+        else el.style.right = Math.round(40 + rand() * 50) + "px";
+        el.style.top = (230 + row * 90) + "px";
         wall.appendChild(el);
         minis.push(el);
       });
 
       const tl = gsap.timeline({ paused: true });
+      const pop = (el, t) => tl.fromTo(el, { opacity: 0, y: 36, scale: 0.92 }, { opacity: 1, y: 0, scale: 1, duration: 0.3, ease: "back.out(2)" }, t);
+      document.querySelectorAll("[data-t]").forEach((el) => pop(el, parseFloat(el.getAttribute("data-t"))));
 
-      // Words and small items: each [data-t] element pops in at its time (seconds).
-      document.querySelectorAll("[data-t]").forEach((el) => {
-        const t = parseFloat(el.getAttribute("data-t"));
-        tl.fromTo(el, { opacity: 0, y: 34, scale: 0.92 }, { opacity: 1, y: 0, scale: 1, duration: 0.32, ease: "back.out(2)" }, t);
-      });
+      // Timecode: show the current second; white text on dark scenes.
+      for (let s = 0; s < 50; s++) {
+        tl.set("#tc" + s, { opacity: 1 }, s);
+        if (s < 49) tl.set("#tc" + s, { opacity: 0 }, s + 1);
+      }
+      tl.set("#tc", { color: "#ffffff" }, 0);
+      tl.set("#tc", { color: "#121214" }, 3);
+      tl.set("#tc", { color: "#ffffff" }, 6.5);
+      tl.set("#tc", { color: "#121214" }, 11);
+      tl.set("#tc", { color: "#ffffff" }, 40);
+      tl.set("#tc", { color: "#121214" }, 43);
+
+      // Coins spin like the reference coins (flip on the vertical axis)
+      const spin = (sel, t, n) => tl.fromTo(sel, { scaleX: 1 }, { scaleX: -1, duration: 0.45, yoyo: true, repeat: n, ease: "sine.inOut" }, t);
 
       // S1
       tl.fromTo("#s1-typing", { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.25, ease: "back.out(2)" }, 0.2);
       tl.fromTo("#s1-typing i", { y: 0 }, { y: -12, duration: 0.18, yoyo: true, repeat: 1, stagger: 0.08, ease: "sine.inOut" }, 0.35);
       tl.to("#s1-typing", { opacity: 0, scale: 0.6, duration: 0.12 }, 0.72);
       tl.fromTo("#s1-bubble", { opacity: 0, scale: 0.4, y: 40 }, { opacity: 1, scale: 1, y: 0, duration: 0.4, ease: "back.out(2.2)" }, 0.8);
-      tl.fromTo("#s1-bubble", { scale: 1 }, { scale: 1.08, duration: 1.8, ease: "power1.inOut", immediateRender: false }, 1.2);
 
-      // S2
-      tl.fromTo("#s2-mascot", { opacity: 0, scale: 0.3, y: 200, rotation: -10 }, { opacity: 1, scale: 1, y: 0, rotation: 0, duration: 0.55, ease: "back.out(1.8)" }, 3.05);
-      tl.fromTo("#s2-mascot", { y: 0 }, { y: -26, duration: 0.6, yoyo: true, repeat: 3, ease: "sine.inOut", immediateRender: false }, 3.6);
-      ["#s2-d1", "#s2-d2", "#s2-d3"].forEach((id, i) => {
-        tl.fromTo(id, { opacity: 0, scale: 0 }, { opacity: 1, scale: 1, duration: 0.4, ease: "back.out(2)" }, 3.2 + i * 0.12);
-        tl.fromTo(id, { scaleX: 1 }, { scaleX: 0.25, duration: 0.5, yoyo: true, repeat: 4, ease: "sine.inOut" }, 3.6 + i * 0.1);
-      });
+      // S2: mascot rises in from the bottom edge, bobs
+      tl.fromTo("#s2-m", { y: 700, rotation: 8 }, { y: 0, rotation: 0, duration: 0.6, ease: "back.out(1.4)" }, 3.0);
+      tl.to("#s2-m", { y: -24, duration: 0.55, yoyo: true, repeat: 3, ease: "sine.inOut" }, 3.65);
+      spin("#s2-c1", 3.1, 6); spin("#s2-c2", 3.3, 6);
 
-      // S3
-      tl.fromTo("#s3-h1", { scale: 1.05 }, { scale: 1, duration: 4.3, ease: "none" }, 6.5);
+      // S3: mascot with phone slides up
+      tl.fromTo("#s3-m", { y: 600 }, { y: 0, duration: 0.6, ease: "back.out(1.3)" }, 7.2);
+      tl.to("#s3-m", { y: -18, duration: 0.6, yoyo: true, repeat: 4, ease: "sine.inOut" }, 7.9);
 
-      // S4 strikes
+      // S4
       tl.fromTo("#s4-st1", { scaleX: 0 }, { scaleX: 1, duration: 0.25, ease: "power3.out" }, 11.55);
       tl.fromTo("#s4-st2", { scaleX: 0 }, { scaleX: 1, duration: 0.25, ease: "power3.out" }, 12.45);
-      tl.fromTo("#s4-app", { rotation: 0 }, { rotation: -8, duration: 0.2, ease: "power2.out" }, 11.6);
-      tl.fromTo("#s4-login", { rotation: 0 }, { rotation: 6, duration: 0.2, ease: "power2.out" }, 12.5);
 
-      // S5 cards: wipe in, request bubble flies into the orb, result pops out.
+      // S5 cards: colour wipe, headline, request card, coin flips, result card slams in
       for (let k = 0; k < 7; k++) {
         const c = 15.5 + 2.2 * k, id = "#c" + (k + 1);
-        tl.fromTo(id + " .fill", { clipPath: "inset(0 0 0 100%)" }, { clipPath: "inset(0 0 0 0%)", duration: 0.28, ease: "power3.out" }, c);
-        tl.fromTo(id + " .head", { opacity: 0, x: 80 }, { opacity: 1, x: 0, duration: 0.35, ease: "expo.out" }, c + 0.08);
-        tl.fromTo(id + " .req", { opacity: 0, y: 40, scale: 0.9 }, { opacity: 1, y: 0, scale: 1, duration: 0.3, ease: "back.out(2)" }, c + 0.15);
-        tl.to(id + " .req .bubble", { x: 300, y: 300, scale: 0.15, opacity: 0, duration: 0.3, ease: "power3.in" }, c + 0.95);
-        tl.fromTo(id + " .orb", { scale: 0.6, rotation: 0 }, { scale: 1, rotation: 180, duration: 0.5, ease: "back.out(2)" }, c + 0.1);
-        tl.fromTo(id + " .orb", { scale: 1 }, { scale: 1.25, duration: 0.12, yoyo: true, repeat: 1, ease: "power2.out", immediateRender: false }, c + 1.22);
-        tl.fromTo(id + " .result", { opacity: 0, scale: 0.3, y: -260 }, { opacity: 1, scale: 1, y: 0, duration: 0.4, ease: "back.out(1.6)" }, c + 1.28);
-        if (document.querySelector(id + " .result .tick")) {
-          tl.fromTo(id + " .result .tick", { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.2, stagger: 0.1, ease: "power3.out" }, c + 1.5);
+        tl.fromTo(id + " .fill", { clipPath: "inset(0 0 100% 0)" }, { clipPath: "inset(0 0 0% 0)", duration: 0.25, ease: "power3.out" }, c);
+        tl.fromTo(id + " .head", { opacity: 0, y: 60 }, { opacity: 1, y: 0, duration: 0.35, ease: "expo.out" }, c + 0.06);
+        tl.fromTo(id + " .req", { opacity: 0, x: -120, rotation: -3 }, { opacity: 1, x: 0, rotation: -1.5, duration: 0.35, ease: "back.out(1.6)" }, c + 0.18);
+        tl.fromTo(id + " .coin", { opacity: 0, scale: 0 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2)" }, c + 0.3);
+        spin(id + " .coin", c + 0.6, 3);
+        tl.fromTo(id + " .result", { opacity: 0, y: 160, rotation: 4 }, { opacity: 1, y: 0, rotation: 1.5, duration: 0.42, ease: "back.out(1.5)" }, c + 0.95);
+        if (document.querySelector(id + " .tick")) {
+          tl.fromTo(id + " .tick", { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.2, stagger: 0.12, ease: "power3.out" }, c + 1.25);
         }
       }
-      tl.fromTo("#c6 .bars u", { scaleY: 0 }, { scaleY: 1, duration: 0.35, stagger: 0.05, ease: "back.out(1.4)" }, 26.5 + 1.5);
-      tl.fromTo("#c4 .line", { scaleX: 0, transformOrigin: "0 50%" }, { scaleX: 1, duration: 0.25, stagger: 0.07, ease: "power3.out" }, 22.1 + 1.5);
-      tl.fromTo("#c7-prog", { scaleX: 0 }, { scaleX: 0.6, duration: 0.8, ease: "none" }, 28.7 + 1.4);
-      tl.fromTo("#c2 .slots span", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.2, stagger: 0.06 }, 17.7 + 1.55);
-      tl.fromTo("#m-badge img", { y: 0 }, { y: -10, duration: 0.55, yoyo: true, repeat: 27, ease: "sine.inOut" }, 15.5);
+      tl.fromTo("#c6 .bars u", { scaleY: 0 }, { scaleY: 1, duration: 0.35, stagger: 0.06, ease: "back.out(1.4)" }, 26.5 + 1.2);
+      tl.fromTo("#c4 .line", { scaleX: 0 }, { scaleX: 1, duration: 0.25, stagger: 0.08, ease: "power3.out" }, 22.1 + 1.25);
+      tl.fromTo("#c7-prog", { scaleX: 0 }, { scaleX: 0.65, duration: 0.9, ease: "none" }, 28.7 + 1.2);
+      tl.fromTo("#c2 .slots span", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.2, stagger: 0.06 }, 17.7 + 1.25);
+      tl.fromTo("#badge", { scale: 0 }, { scale: 1, duration: 0.4, ease: "back.out(2)" }, 15.6);
+      tl.to("#badge img", { y: -12, duration: 0.55, yoyo: true, repeat: 26, ease: "sine.inOut" }, 16.0);
 
-      // S6 wall: requests pour in, then get pulled into the orb
+      // S6: requests pour in, then dive into the mascot's O (its hole is at about 540, 1591)
       minis.forEach((el, i) => {
-        tl.fromTo(el, { opacity: 0, scale: 0.4, rotation: (rand() - 0.5) * 16 }, { opacity: 1, scale: 1, rotation: (rand() - 0.5) * 6, duration: 0.25, ease: "back.out(2)" }, 31.0 + i * 0.075);
-        // Centre of each bubble from its known position (width estimated from text length).
-        const w = el.textContent.length * 16 + 56;
+        tl.fromTo(el, { opacity: 0, scale: 0.4, rotation: (rand() - 0.5) * 14 }, { opacity: 1, scale: 1, rotation: (rand() - 0.5) * 6, duration: 0.25, ease: "back.out(2)" }, 31.0 + i * 0.1);
+        const w = el.textContent.length * 17 + 60;
         const cx = el.style.left ? parseFloat(el.style.left) + w / 2 : 1080 - parseFloat(el.style.right) - w / 2;
-        const cy = parseFloat(el.style.top) + 38;
-        tl.to(el, { x: 540 - cx, y: 960 - cy, scale: 0.05, opacity: 0, duration: 0.45, ease: "power3.in" }, 33.3 + (i % 6) * 0.03);
+        const cy = parseFloat(el.style.top) + 40;
+        tl.to(el, { x: 540 - cx, y: 1591 - cy, scale: 0.05, opacity: 0, duration: 0.45, ease: "power3.in" }, 33.2 + (i % 8) * 0.04);
       });
-      tl.fromTo("#s6-orb", { scale: 0.5, rotation: 0 }, { scale: 1, rotation: 90, duration: 0.6, ease: "back.out(2)" }, 31.0);
-      tl.fromTo("#s6-orb", { scale: 1 }, { scale: 1.6, duration: 0.25, yoyo: true, repeat: 1, ease: "power2.out", immediateRender: false }, 33.75);
+      tl.fromTo("#s6-m", { y: 600 }, { y: 0, duration: 0.55, ease: "back.out(1.3)" }, 31.0);
+      tl.to("#s6-m", { scale: 1.08, duration: 0.18, yoyo: true, repeat: 1, ease: "power2.out", transformOrigin: "50% 60%" }, 33.65);
 
       // S7
-      tl.fromTo("#s7-phone", { opacity: 0, y: 260 }, { opacity: 1, y: 0, duration: 0.5, ease: "expo.out" }, 35.1);
+      tl.fromTo("#s7-phone", { opacity: 0, y: 300, rotation: 3 }, { opacity: 1, y: 0, rotation: 0, duration: 0.5, ease: "expo.out" }, 35.05);
 
-      // S8
-      tl.fromTo("#s8-ring", { scale: 0.3, rotation: 0 }, { scale: 1.08, rotation: 120, duration: 2.9, ease: "power2.out" }, 40.0);
-      tl.fromTo("#s8-ring", { scaleX: 1 }, { scaleX: 0.85, duration: 0.6, yoyo: true, repeat: 3, ease: "sine.inOut" }, 40.4);
+      // S8: giant pixel ring spins and grows
+      tl.fromTo("#s8-ring", { scale: 0.35, rotation: -40 }, { scale: 1, rotation: 20, duration: 2.9, ease: "power2.out" }, 40.0);
+      spin("#s8-ring", 40.3, 2);
 
       // S9 end card
-      tl.fromTo("#s9-word .o", { scale: 0, rotation: -180 }, { scale: 1, rotation: 0, duration: 0.6, ease: "back.out(1.8)" }, 43.0);
-      tl.fromTo("#s9-word span:last-child", { opacity: 0, x: -40 }, { opacity: 1, x: 0, duration: 0.45, ease: "expo.out" }, 43.15);
-      tl.fromTo("#s9-mascot", { opacity: 0, scale: 0.3, y: 120 }, { opacity: 1, scale: 1, y: 0, duration: 0.55, ease: "back.out(1.8)" }, 43.3);
-      tl.fromTo("#s9-mascot", { y: 0 }, { y: -18, duration: 0.7, yoyo: true, repeat: 7, ease: "sine.inOut", immediateRender: false }, 43.9);
+      tl.fromTo("#s9-word img", { scale: 0, rotation: -180 }, { scale: 1, rotation: 0, duration: 0.6, ease: "back.out(1.8)" }, 43.0);
+      tl.fromTo("#s9-word span", { opacity: 0, x: -40 }, { opacity: 1, x: 0, duration: 0.45, ease: "expo.out" }, 43.15);
+      tl.fromTo("#s9-m", { y: 500, opacity: 0 }, { y: 0, opacity: 1, duration: 0.55, ease: "back.out(1.5)" }, 43.25);
+      tl.to("#s9-m", { y: -18, duration: 0.7, yoyo: true, repeat: 7, ease: "sine.inOut" }, 43.85);
       tl.fromTo("#s9-acro", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 43.7);
       tl.fromTo("#s9-btn", { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.45, ease: "back.out(2)" }, 45.2);
-      tl.fromTo("#s9-btn", { scale: 1 }, { scale: 1.05, duration: 0.6, yoyo: true, repeat: 5, ease: "sine.inOut", immediateRender: false }, 45.8);
+      tl.to("#s9-btn", { scale: 1.05, duration: 0.6, yoyo: true, repeat: 5, ease: "sine.inOut" }, 45.75);
       tl.fromTo("#s9-url", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.4, ease: "power3.out" }, 45.6);
       tl.fromTo("#s9-small", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 46.2);
-      ["#s9-d1", "#s9-d2", "#s9-d3", "#s9-d4"].forEach((id, i) => {
+      ["#s9-c1", "#s9-c2", "#s9-c3", "#s9-c4"].forEach((id, i) => {
         tl.fromTo(id, { opacity: 0, scale: 0 }, { opacity: 1, scale: 1, duration: 0.4, ease: "back.out(2)" }, 43.4 + i * 0.1);
-        tl.fromTo(id, { scaleX: 1 }, { scaleX: 0.25, duration: 0.6, yoyo: true, repeat: 7, ease: "sine.inOut" }, 43.8 + i * 0.1);
+        spin(id, 43.8 + i * 0.1, 6);
       });
 
       window.__timelines["main"] = tl;
