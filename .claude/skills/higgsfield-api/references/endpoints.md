@@ -1,0 +1,90 @@
+# Higgsfield API endpoints
+
+Taken from docs.higgsfield.ai on 2026-10-06 (82 generation workflows; Soul ID training at `/v1/custom-references` is left out). This list can go stale. The model page is the source of truth for fields.
+
+Schema page for a row: `https://docs.higgsfield.ai/docs/models/<docs page>.md`.
+
+| Endpoint ID | Docs page |
+|---|---|
+| `alibaba/happy-horse/image-to-video` | `happy-horse-1/image-to-video` |
+| `alibaba/happy-horse/reference-to-video` | `happy-horse-1/reference-to-video` |
+| `alibaba/happy-horse/text-to-video` | `happy-horse-1/text-to-video` |
+| `alibaba/happy-horse/v1.1/image-to-video` | `happy-horse-1-1/image-to-video` |
+| `alibaba/happy-horse/v1.1/reference-to-video` | `happy-horse-1-1/reference-to-video` |
+| `alibaba/happy-horse/v1.1/text-to-video` | `happy-horse-1-1/text-to-video` |
+| `alibaba/qwen-image-3/edit` | `qwen-image-3/edit` |
+| `alibaba/qwen-image-3/text-to-image` | `qwen-image-3/text-to-image` |
+| `alibaba/wan-3.0-prime/image-to-video` | `wan-3-prime/image-to-video` |
+| `alibaba/wan-3.0-prime/reference-to-video` | `wan-3-prime/reference-to-video` |
+| `alibaba/wan-3.0-prime/text-to-video` | `wan-3-prime/text-to-video` |
+| `alibaba/wan-3.0/image-to-video` | `wan-3/image-to-video` |
+| `alibaba/wan-3.0/reference-to-video` | `wan-3/reference-to-video` |
+| `alibaba/wan-3.0/text-to-video` | `wan-3/text-to-video` |
+| `bytedance/seedance-2.0/image-to-video` | `seedance-2/image-to-video` |
+| `bytedance/seedance-2.0/reference-to-video` | `seedance-2/reference-to-video` |
+| `bytedance/seedance-2.0/text-to-video` | `seedance-2/text-to-video` |
+| `bytedance/seedance-2.5/image-to-video` | `seedance-2-5/image-to-video` |
+| `bytedance/seedance-2.5/reference-to-video` | `seedance-2-5/reference-to-video` |
+| `bytedance/seedance-2.5/text-to-video` | `seedance-2-5/text-to-video` |
+| `bytedance/seedance-2.5/video-edit` | `seedance-2-5/video-edit` |
+| `bytedance/seedance-2.5/video-extend` | `seedance-2-5/video-extend` |
+| `higgsfield-ai/soul/cinema` | `soul-cinema/generate` |
+| `higgsfield-ai/soul/standard` | `soul-standard/generate` |
+| `higgsfield-ai/soul/v2/standard` | `soul-2/generate` |
+| `higgsfield/cinema-studio/4.0` | `cinema-studio-4/generate` |
+| `higgsfield/genjutsu/motion-transfer/v1.0` | `genjutsu/motion-transfer` |
+| `higgsfield/genjutsu/object-swap/v1.0` | `genjutsu/object-swap` |
+| `higgsfield/genjutsu/restyle/v1.0` | `genjutsu/restyle` |
+| `ideogram/v4.0` | `ideogram-4/generate` |
+| `kling-video/motion-control/pro` | `kling-2-6-motion-control/pro` |
+| `kling-video/motion-control/std` | `kling-2-6-motion-control/std` |
+| `kling-video/o3/first-last-frame` | `kling-o3/first-last-frame` |
+| `kling-video/o3/image-reference` | `kling-o3/image-reference` |
+| `kling-video/o3/video-edit` | `kling-o3/video-edit` |
+| `kling-video/o3/video-reference` | `kling-o3/video-reference` |
+| `kling-video/omni/first-last-frame` | `kling-omni/first-last-frame` |
+| `kling-video/omni/image-reference` | `kling-omni/image-reference` |
+| `kling-video/omni/video-edit` | `kling-omni/video-edit` |
+| `kling-video/omni/video-reference` | `kling-omni/video-reference` |
+| `kling-video/v2.5-turbo/pro/image-to-video` | `kling-2-5-turbo/pro-image-to-video` |
+| `kling-video/v2.5-turbo/pro/text-to-video` | `kling-2-5-turbo/pro-text-to-video` |
+| `kling-video/v2.5-turbo/standard/image-to-video` | `kling-2-5-turbo/standard-image-to-video` |
+| `kling-video/v2.6/pro/image-to-video` | `kling-2-6/pro-image-to-video` |
+| `kling-video/v2.6/pro/text-to-video` | `kling-2-6/pro-text-to-video` |
+| `kling-video/v3.0-turbo/image-to-video` | `kling-3/turbo-image-to-video` |
+| `kling-video/v3.0-turbo/text-to-video` | `kling-3/turbo-text-to-video` |
+| `kling-video/v3.0/4k/image-to-video` | `kling-3/4k-image-to-video` |
+| `kling-video/v3.0/4k/text-to-video` | `kling-3/4k-text-to-video` |
+| `kling-video/v3.0/pro/image-to-video` | `kling-3/pro-image-to-video` |
+| `kling-video/v3.0/pro/text-to-video` | `kling-3/pro-text-to-video` |
+| `kling-video/v3.0/std/image-to-video` | `kling-3/standard-image-to-video` |
+| `kling-video/v3.0/std/text-to-video` | `kling-3/standard-text-to-video` |
+| `kling-video/v3/motion-control/pro` | `kling-3-motion-control/pro` |
+| `kling-video/v3/motion-control/std` | `kling-3-motion-control/std` |
+| `lightricks/ltx-2.5/image-to-video/fast` | `ltx-2-5/image-to-video-fast` |
+| `lightricks/ltx-2.5/image-to-video/pro` | `ltx-2-5/image-to-video-pro` |
+| `lightricks/ltx-2.5/text-to-video/fast` | `ltx-2-5/text-to-video-fast` |
+| `lightricks/ltx-2.5/text-to-video/pro` | `ltx-2-5/text-to-video-pro` |
+| `marketing-studio/image` | `marketing-studio-image/generate-and-edit` |
+| `marketing-studio/image/flare` | `marketing-studio-image/flare` |
+| `marketing-studio/image/sunburst` | `marketing-studio-image/sunburst` |
+| `minimax/h3/image-to-video` | `minimax-h3/image-to-video` |
+| `minimax/h3/reference-to-video` | `minimax-h3/reference-to-video` |
+| `minimax/h3/text-to-video` | `minimax-h3/text-to-video` |
+| `minimax/hailuo-2.3/standard/image-to-video` | `hailuo-2-3/standard-image-to-video` |
+| `minimax/hailuo-2.3/standard/text-to-video` | `hailuo-2-3/standard-text-to-video` |
+| `pixverse/v6/image-to-video` | `pixverse-v6/image-to-video` |
+| `pixverse/v6/text-to-video` | `pixverse-v6/text-to-video` |
+| `recraft/v4.1/pro/text-to-image` | `recraft-v4-1-pro/generate` |
+| `recraft/v4.1/text-to-image` | `recraft-v4-1/text-to-image` |
+| `recraft/v4.1/utility/pro/text-to-image` | `recraft-v4-1-utility-pro/text-to-image` |
+| `recraft/v4.1/utility/text-to-image` | `recraft-v4-1-utility/text-to-image` |
+| `wan/v2.6/image-to-video` | `wan-2-6/image-to-video` |
+| `wan/v2.6/reference-to-video` | `wan-2-6/reference-to-video` |
+| `wan/v2.6/text-to-video` | `wan-2-6/text-to-video` |
+| `wan/v2.7/image-to-video` | `wan-2-7/image-to-video` |
+| `wan/v2.7/reference-to-video` | `wan-2-7/reference-to-video` |
+| `wan/v2.7/text-to-video` | `wan-2-7/text-to-video` |
+| `xai/grok-imagine-image-2.0` | `grok-image-2/generate-and-edit` |
+| `xai/grok-imagine-video/v1.5/reference-to-video` | `grok-video-1-5/reference-to-video` |
+| `z-image/turbo` | `z-image-turbo/generate` |

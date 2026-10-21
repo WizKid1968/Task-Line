@@ -1,0 +1,19 @@
+[project]
+name = "higgsfield-workspace"
+version = "0.1.0"
+description = "Model-agnostic command-line access to the Higgsfield API"
+requires-python = ">=3.8"
+dependencies = [
+  "higgsfield-client>=0.2.0,<0.3",
+  "python-dotenv>=1.0",
+]
+
+[project.scripts]
+hf = "hf_cli:main"
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+py-modules = ["hf_cli"]
