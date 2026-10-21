@@ -22,6 +22,8 @@ into Vercel's environment variables, never into code, GitHub, or chat.
 | `AGENT_PHONE` | The number texts are sent from (8100) | Claude |
 | `ROUTINE_FIRE_URL` | The routine's API trigger address (`https://api.anthropic.com/v1/claude_code/routines/trig_.../fire`). Not secret. | You (copy from the routine page) |
 | `ROUTINE_TOKEN` | The routine's API trigger token (starts `sk-ant-oat01-`). **Private.** | **You** |
+| `JEV_API_KEY` | Jev (TypeSafe AI) key for the safety checks. **Private.** Without it every check takes the safer path. | **You** |
+| `CRON_SECRET` | Password Vercel's daily scheduler sends to the watchdog. **Private.** | Claude (generated) |
 | `JOB_REPORT_SECRET` | A long random password (32+ characters) the routine sends back with results. Must match the routine environment's network secret. **Private.** | **You** |
 
 Check: open `https://<your-app>.vercel.app/api/health`. It shows `"configured": true`
@@ -100,14 +102,33 @@ server checks the secret and the job's random id (one report per job) and texts 
 result only to whoever asked. Limits: 10 jobs per person per hour (the routine allows
 30 per hour). Read-only is an instruction to the worker, not a hard lock.
 
-## 6. Developer commands
+## 6. Jev safety checks
+
+Jev (TypeSafe AI, `src/jev.ts`, `src/jevChecks.ts`) answers fixed yes/no questions with a
+probability. Every question and cutoff was tested on realistic examples first (29 of 29
+correct). It is a second judge, never the only lock, and when it's down or unsure the system
+takes the safer path.
+
+| # | Where | Question | If flagged | If Jev is down |
+|---|---|---|---|---|
+| 1 | Look-up (`start_lookup`) | Would this send, change, delete or spend? (cutoff 0.35) | Sent back to ask-first (`claude_job`) | Sent back to ask-first |
+| 2 | Change job (`claude_job`) | Money? (0.5) Deleting, many people, sensitive documents? (0.5) | Money: refused. Risky: code word even on calls | Code word required |
+| 3 | Result report | Password or code? Actions not asked for? (0.5) | Held; requester gets an alert, result kept in Jobs table | Sent, marked unchecked |
+| 4 | Forwarded reply | Scam? Orders to the assistant? (0.7) | Forwarded with a warning | Forwarded without label |
+| 5 | Daily watchdog (`/api/cron/watchdog`, 9 AM New York) | Missed hand-off? Said too much to a stranger? (0.6) | Owner gets a text | Counted as "couldn't check" in the text |
+| 6 | Worker email screening (`/api/jobs/screen`) | Scam, phishing or malware? (0.6) | Worker skips the email, lists it as suspected scam | "unchecked": worker uses its own judgment |
+
+What leaves the server for Jev: the task text, the worker's result, forwarded replies, email
+sender/subject/preview lines, and (watchdog) conversation transcripts with code words blanked out.
+
+## 7. Developer commands
 
 ```
 npm install
 npm run check   # type check + tests
 ```
 
-## 7. Current status (Phase 1)
+## 8. Current status (Phase 1)
 
 - Server live at `https://task-line-phi.vercel.app` (`/api/health` reports configured).
 - Vercel protection: standard (production address public, previews protected).

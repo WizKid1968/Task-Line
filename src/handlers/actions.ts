@@ -42,8 +42,29 @@ export async function handleRequestAction(req: Request, deps: Deps): Promise<Res
     return json(400, { error: "invalid_details", message: problem });
   }
 
+  let forceCodeWord = false;
+  if (def.check) {
+    const verdict = await def.check(details, { config: deps.config, fetchImpl: deps.fetchImpl });
+    logEvent("safety_check", { type: def.type, block: Boolean(verdict.block), forceCodeWord: verdict.forceCodeWord, note: verdict.note });
+    if (verdict.block || verdict.forceCodeWord) {
+      await bestEffort(
+        deps.store.log({
+          who: person.name,
+          phone: person.phone,
+          channel: claims.channel,
+          event: verdict.block ? "job_refused" : "code_word_forced",
+          details: `Jev: ${verdict.note}`,
+          conversation: claims.conversation,
+        }),
+        1500,
+      );
+    }
+    if (verdict.block) return json(403, { error: "not_allowed", message: verdict.block });
+    forceCodeWord = verdict.forceCodeWord;
+  }
+
   const now = deps.now();
-  const needsCodeWord = codeWordRequired(claims.channel, claims.verified);
+  const needsCodeWord = forceCodeWord || codeWordRequired(claims.channel, claims.verified);
   const readBack = def.readBack(details, { callerName: person.name });
   const pending = await deps.store.createPending({
     code: newPendingCode(),

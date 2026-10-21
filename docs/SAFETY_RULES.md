@@ -14,6 +14,14 @@ new app. Written October 2026. Update this page whenever an app or rule changes.
    instructions, Claude's safety checker, a short list of websites the worker may
    reach, and above all **what the worker's apps are able to do.**
 
+## The second judge (Jev)
+
+Six checkpoints ask Jev, an independent AI from TypeSafe, yes/no questions before risky steps:
+look-ups that might really change things, jobs involving money or deleting, results containing
+passwords or unexpected actions, scam replies, a daily review of the phone agent, and scam
+emails before the worker opens them. Details and cutoffs: `docs/SETUP.md`, section 6. If Jev
+is down or unsure, the safer path wins. It never replaces the code word or the server checks.
+
 ## The rules
 
 1. **Reading is free. Changing asks first. Deleting, sending and money need extra care

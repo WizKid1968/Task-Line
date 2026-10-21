@@ -1,5 +1,6 @@
 import { type Config, findPerson } from "../config.js";
 import { MAX_TASK_CHARS, startJob } from "../jobs.js";
+import { checkJob } from "../jevChecks.js";
 import { normalizeUsPhone } from "../phone.js";
 import type { SessionClaims } from "../session.js";
 import type { Store } from "../store/types.js";
@@ -28,6 +29,11 @@ export interface ActionDefinition {
   validate(details: Record<string, unknown>, info: RequestInfo): string | null;
   /** Plain-English sentence the agent reads back before asking for a yes. */
   readBack(details: Record<string, unknown>, info: RequestInfo): string;
+  /**
+   * Optional extra safety check before the request is saved (Jev). It can refuse
+   * the request or require the code word even on carrier-confirmed calls.
+   */
+  check?(details: Record<string, unknown>, ctx: { config: Config; fetchImpl?: typeof fetch }): Promise<{ block: string | null; forceCodeWord: boolean; note: string }>;
   /** Does the work. Returns a short result for the agent to tell the caller. */
   run(details: Record<string, unknown>, ctx: ActionContext): Promise<string>;
 }
@@ -147,6 +153,7 @@ const claudeJobAction: ActionDefinition = {
     if (task.length > MAX_TASK_CHARS) return `That's too long (max ${MAX_TASK_CHARS} characters).`;
     return null;
   },
+  check: (details, ctx) => checkJob(ctx.config.jevApiKey, jobTask(details), ctx.fetchImpl),
   readBack: (details) =>
     `I'll do this job, and it may make changes: "${jobTask(details)}". I'll text you the result when it's done.`,
   run: async (details, ctx) => {

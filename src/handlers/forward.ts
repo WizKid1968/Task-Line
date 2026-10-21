@@ -1,6 +1,7 @@
 import type { Deps } from "../deps.js";
 import { bestEffort, json } from "../http.js";
 import { logEvent, maskPhone } from "../log.js";
+import { checkReply } from "../jevChecks.js";
 import { sendText } from "../telnyxSend.js";
 import { authenticateRecipient } from "./auth.js";
 
@@ -36,7 +37,11 @@ export async function handleForwardReply(req: Request, deps: Deps): Promise<Resp
 
   // Strip the sign-off from the quote of the original text, so it reads cleanly.
   const original = outreach.message.replace(/ — Sent for .*$/, "");
+  // Checkpoint 4: label replies that look like scams or try to order the assistant around.
+  const warnings = await checkReply(deps.config.jevApiKey, reply, deps.fetchImpl);
+  if (warnings.length) logEvent("reply_flagged", { from: maskPhone(phone), warnings });
   const text =
+    (warnings.length ? `${warnings.join(" ")}\n` : "") +
     `Reply from ${prettyPhone(phone)} to your text "${shorten(original, QUOTE_CHARS)}":\n` +
     shorten(reply, MAX_REPLY_CHARS);
 

@@ -4,7 +4,7 @@ import { STRANGER_INSTRUCTIONS } from "../src/agentInstructions.js";
 import { handleConfirmAction, handleRequestAction } from "../src/handlers/actions.js";
 import { handleForwardReply, MAX_FORWARDS } from "../src/handlers/forward.js";
 import { handleInit } from "../src/handlers/init.js";
-import { makeDeps, NOW, OWNER_PHONE, signedRequest, STRANGER_PHONE, TRUSTED_PHONE } from "./helpers.js";
+import { fakeNet, makeDeps, NOW, OWNER_PHONE, signedRequest, STRANGER_PHONE, TRUSTED_PHONE } from "./helpers.js";
 
 const INIT = "https://x.test/api/telnyx/init";
 const REQ = "https://x.test/api/tools/request-action";
@@ -12,14 +12,9 @@ const CONFIRM = "https://x.test/api/tools/confirm-action";
 const FORWARD = "https://x.test/api/tools/forward-reply";
 const RECIPIENT = "+15555550143";
 
-function fakeTelnyx() {
-  const sent: { to: string; text: string }[] = [];
-  const fetchImpl = (async (_url: string, init: RequestInit) => {
-    const body = JSON.parse(String(init.body));
-    sent.push({ to: body.to, text: body.text });
-    return new Response(JSON.stringify({ data: { id: `msg-${sent.length}` } }), { status: 200 });
-  }) as unknown as typeof fetch;
-  return { sent, fetchImpl };
+function fakeTelnyx(jev: Record<string, number> = {}) {
+  const net = fakeNet({ jev });
+  return { sent: net.texts, fetchImpl: net.fetchImpl, net };
 }
 
 function presets(phone: string, channel = "sms_chat") {

@@ -2,35 +2,16 @@ import { describe, expect, it } from "vitest";
 import { handleConfirmAction, handleRequestAction } from "../src/handlers/actions.js";
 import { handleJobReport, handleStartLookup } from "../src/handlers/jobs.js";
 import { MAX_JOBS_PER_HOUR } from "../src/jobs.js";
-import { makeDeps, OWNER_PHONE, signedRequest, STRANGER_PHONE, TRUSTED_PHONE } from "./helpers.js";
+import { fakeNet, makeDeps, OWNER_PHONE, signedRequest, STRANGER_PHONE, TRUSTED_PHONE } from "./helpers.js";
 
 const LOOKUP = "https://x.test/api/tools/start-lookup";
 const REQ = "https://x.test/api/tools/request-action";
 const CONFIRM = "https://x.test/api/tools/confirm-action";
 const REPORT = "https://x.test/api/jobs/report";
-const FIRE_URL = "https://api.anthropic.com/v1/claude_code/routines/trig_TEST123/fire";
 const SECRET = "test-report-secret-that-is-long-enough-0123";
 
-/** Fake network: the routine's fire endpoint and Telnyx texting. */
-function fakeNet(fireStatus = 200) {
-  const fires: { headers: Headers; body: any }[] = [];
-  const texts: { to: string; text: string }[] = [];
-  const fetchImpl = (async (url: string, init: RequestInit) => {
-    const body = JSON.parse(String(init.body));
-    if (url === FIRE_URL) {
-      fires.push({ headers: new Headers(init.headers), body });
-      return fireStatus === 200
-        ? new Response(JSON.stringify({ type: "routine_fire", claude_code_session_id: "session_1", claude_code_session_url: "https://claude.ai/code/session_1" }))
-        : new Response(JSON.stringify({ type: "error", error: { type: "rate_limit_error", message: "slow down" } }), { status: fireStatus });
-    }
-    texts.push({ to: body.to, text: body.text });
-    return new Response(JSON.stringify({ data: { id: `msg-${texts.length}` } }));
-  }) as unknown as typeof fetch;
-  return { fires, texts, fetchImpl };
-}
-
-function setup(fireStatus = 200) {
-  const net = fakeNet(fireStatus);
+function setup(fireStatus = 200, jev: Record<string, number> = {}, jevDown = false) {
+  const net = fakeNet({ fireStatus, jev, jevDown });
   return { deps: { ...makeDeps(), fetchImpl: net.fetchImpl }, net };
 }
 

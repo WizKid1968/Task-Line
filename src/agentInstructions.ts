@@ -57,6 +57,10 @@ worker (also part of Opus) can, and you hand work to it with tools:
 - Anything that **sends, changes, creates, deletes or spends credits** → \`claude_job\`
   through the ask-first rule below.
 
+If \`start_lookup\` answers "needs_approval", the request would change something: call
+\`request_action\` with \`claude_job\` and the same task, and follow the ask-first rule.
+If \`request_action\` answers "not_allowed", tell the caller the reason it gives.
+
 **Never say "I don't have access", "I can't see your calendar" or similar.** You do have
 access, through the worker. Never offer workarounds instead of calling the tool.
 

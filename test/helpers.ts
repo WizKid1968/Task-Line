@@ -33,6 +33,8 @@ export function makeConfig(): Config {
       token: "test-routine-token",
       reportSecret: "test-report-secret-that-is-long-enough-0123",
     },
+    jevApiKey: "test-jev-key",
+    cronSecret: "test-cron-secret",
     people: [
       { role: "owner", name: "Owner", phone: OWNER_PHONE, codeWord: "Blue Falcon" },
       { role: "trusted", name: "Friend", phone: TRUSTED_PHONE, codeWord: "green river" },
@@ -79,3 +81,45 @@ export function toolRequest(url: string, body: unknown, token: string | null): R
 }
 
 export { encryptForTelnyx };
+
+/**
+ * A fake network for tests: answers Jev questions (all "no" = 0.05 unless set in
+ * `jev`), and records everything else (routine fires, Telnyx texts).
+ * Set `jevDown` to simulate Jev being unreachable.
+ */
+export function fakeNet(opts: { jev?: Record<string, number> | ((state: string, id: string) => number); jevDown?: boolean; fireStatus?: number; routes?: Record<string, unknown> } = {}) {
+  const jevCalls: { state: string; ids: string[] }[] = [];
+  const fires: { headers: Headers; body: any }[] = [];
+  const texts: { to: string; text: string }[] = [];
+  const other: { url: string; body: any }[] = [];
+  const fetchImpl = (async (url: string, init: RequestInit = {}) => {
+    const body = init.body ? JSON.parse(String(init.body)) : null;
+    if (url.startsWith("https://api.typesafe.ai/")) {
+      jevCalls.push({ state: body.state, ids: Object.keys(body.questions) });
+      if (opts.jevDown) return new Response("overloaded", { status: 529 });
+      const answers: Record<string, unknown> = {};
+      for (const id of Object.keys(body.questions)) {
+        const p = typeof opts.jev === "function" ? opts.jev(body.state, id) : opts.jev?.[id];
+        answers[id] = { type: "noul", noul: p ?? 0.05 };
+      }
+      return new Response(JSON.stringify({ model: "jev-test", answers }));
+    }
+    if (url.includes("/claude_code/routines/")) {
+      fires.push({ headers: new Headers(init.headers), body });
+      const status = opts.fireStatus ?? 200;
+      return status === 200
+        ? new Response(JSON.stringify({ type: "routine_fire", claude_code_session_id: "session_1", claude_code_session_url: "https://claude.ai/code/session_1" }))
+        : new Response(JSON.stringify({ type: "error", error: { type: "rate_limit_error", message: "slow down" } }), { status });
+    }
+    if (url === "https://api.telnyx.com/v2/messages") {
+      texts.push({ to: body.to, text: body.text });
+      return new Response(JSON.stringify({ data: { id: `msg-${texts.length}` } }));
+    }
+    other.push({ url, body });
+    for (const [prefix, response] of Object.entries(opts.routes ?? {})) {
+      if (url.startsWith(prefix)) return new Response(JSON.stringify(response));
+    }
+    return new Response("{}", { status: 404 });
+  }) as unknown as typeof fetch;
+  return { jevCalls, fires, texts, other, fetchImpl };
+}

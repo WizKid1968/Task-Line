@@ -184,6 +184,6 @@ None right now.
   "does this send/change/delete/spend?"; (2) before a change job, money/deleting/mass email;
   (3) before a result is texted, secrets or unrequested actions; (4) replies from people you texted,
   scam or orders to the assistant; (5) daily watchdog of the phone agent's conversations;
-  (6) inside the worker, screening emails by sender/subject before opening. Waiting on: access to
-  docs.typesafe.ai and api.typesafe.ai from the builder environment, and the Jev key in Vercel.
+  (6) inside the worker, screening emails by sender/subject before opening. **Built Oct 21**, all six,
+  with 86 tests passing; see docs/SETUP.md section 6.
 

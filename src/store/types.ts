@@ -41,7 +41,7 @@ export interface Outreach {
   recordId?: string;
 }
 
-export type JobStatus = "starting" | "running" | "done" | "failed";
+export type JobStatus = "starting" | "running" | "done" | "failed" | "held";
 /** read_only: look things up, change nothing. approved_changes: the caller approved changes (with code word if needed). */
 export type JobPermission = "read_only" | "approved_changes";
 

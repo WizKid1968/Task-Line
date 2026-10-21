@@ -28,6 +28,10 @@ export interface Config {
   telnyx: TelnyxSendConfig;
   /** Optional: the Claude Code routine that does bigger jobs. Jobs are off until all three are set. */
   routine: RoutineConfig;
+  /** Optional: Jev (TypeSafe AI) safety checks. Without a key every check takes the safer path. */
+  jevApiKey: string | null; // JEV_API_KEY
+  /** Optional: Vercel sends this with its daily scheduled call to the watchdog. */
+  cronSecret: string | null; // CRON_SECRET
 }
 
 export interface RoutineConfig {
@@ -111,7 +115,17 @@ export function loadConfig(env: Env = process.env): Config {
   if (reportSecret && reportSecret.length < 32) throw new ConfigError("JOB_REPORT_SECRET must be at least 32 characters");
   const routine: RoutineConfig = { fireUrl, token: env["ROUTINE_TOKEN"]?.trim() || null, reportSecret };
 
-  return { telnyxPublicKey, people, sessionSecret, telnyxEncryptionKey, airtable, telnyx, routine };
+  return {
+    telnyxPublicKey,
+    people,
+    sessionSecret,
+    telnyxEncryptionKey,
+    airtable,
+    telnyx,
+    routine,
+    jevApiKey: env["JEV_API_KEY"]?.trim() || null,
+    cronSecret: env["CRON_SECRET"]?.trim() || null,
+  };
 }
 
 export function findPerson(config: Config, phone: string | null): Person | null {
