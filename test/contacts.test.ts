@@ -78,3 +78,25 @@ describe("contacts", () => {
     expect(req.read_back).toBe('I\'ll text 555-555-0143 this message: "On my way — Sent for Owner"');
   });
 });
+
+describe("contacts with the same name", () => {
+  it("saving a name that already exists warns that it will replace the number", async () => {
+    const { deps } = setup();
+    await deps.store.saveContact({ name: "Victor", phone: "+15555550170", addedBy: "Owner", createdAt: "" });
+    const save = (await (await handleRequestAction(
+      signedRequest(REQ, { action_type: "save_contact", details: { name: "victor", phone: "555-555-0171" }, ...presets(OWNER_PHONE) }),
+      deps,
+    )).json()) as any;
+    expect(save.read_back).toContain("You already have a contact named victor (555-555-0170). I'll replace that number with 555-555-0171.");
+  });
+
+  it("an exact name wins over first-name matches", async () => {
+    const { deps } = setup();
+    await deps.store.saveContact({ name: "Victor", phone: "+15555550170", addedBy: "Owner", createdAt: "" });
+    await deps.store.saveContact({ name: "Victor Diaz", phone: "+15555550172", addedBy: "Owner", createdAt: "" });
+    const req = (await (await handleRequestAction(text("Victor"), deps)).json()) as any;
+    expect(req.read_back).toContain("Victor (555-555-0170)");
+    const req2 = (await (await handleRequestAction(text("Victor Diaz"), deps)).json()) as any;
+    expect(req2.read_back).toContain("Victor Diaz (555-555-0172)");
+  });
+});

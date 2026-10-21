@@ -198,6 +198,11 @@ function contactDetails(details: Record<string, unknown>): { name: string; phone
 /** Save (or update) a contact so the caller can text them by name. */
 const saveContactAction: ActionDefinition = {
   type: "save_contact",
+  prepare: async (details, ctx) => {
+    const { name } = contactDetails(details);
+    const existing = (await ctx.store.listContacts()).find((c) => c.name.toLowerCase() === name.toLowerCase());
+    return { details: existing ? { ...details, replaces: existing.phone } : details };
+  },
   description: 'Save a contact so texts can be sent by name. details: {"name": "Sam Rivera", "phone": "917-555-0101"}.',
   validate: (details) => {
     const { name, phone } = contactDetails(details);
@@ -207,7 +212,10 @@ const saveContactAction: ActionDefinition = {
   },
   readBack: (details) => {
     const { name, phone } = contactDetails(details);
-    return `I'll save ${name} as ${prettyPhone(phone!)} in your contacts.`;
+    const replaces = typeof details["replaces"] === "string" ? normalizeUsPhone(details["replaces"]) : null;
+    return replaces
+      ? `You already have a contact named ${name} (${prettyPhone(replaces)}). I'll replace that number with ${prettyPhone(phone!)}. To keep both, use a different name, like a last name.`
+      : `I'll save ${name} as ${prettyPhone(phone!)} in your contacts.`;
   },
   run: async (details, ctx) => {
     const { name, phone } = contactDetails(details);

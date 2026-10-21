@@ -2,10 +2,13 @@ import { createHash, timingSafeEqual } from "node:crypto";
 
 /**
  * Speech-to-text and texting add stray capitals, punctuation and spaces
- * ("Blue Falcon." vs "blue falcon"), so compare a cleaned-up form.
+ * ("Blue Falcon." vs "blue falcon"), so compare a cleaned-up form. Accents are
+ * ignored too, so Spanish words match with or without them ("mañana" = "manana").
  */
 export function normalizeCodeWord(value: string): string {
   return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
     .toLowerCase()
     .replace(/[^a-z0-9 ]/g, " ")
     .replace(/\s+/g, " ")

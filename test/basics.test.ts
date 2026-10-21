@@ -130,3 +130,13 @@ describe("settings", () => {
     expect(() => loadConfig({ ...full, TRUSTED_PHONE: full.OWNER_PHONE })).toThrow(/different/);
   });
 });
+
+import { codeWordMatches as cwm } from "../src/codeWord.js";
+describe("Spanish code words", () => {
+  it("match with or without accents, any capitals", () => {
+    expect(cwm("mañana azul", "Mañana Azul")).toBe(true);
+    expect(cwm("manana azul", "mañana azul")).toBe(true);
+    expect(cwm("Corazón", "corazon")).toBe(true);
+    expect(cwm("corazones", "corazón")).toBe(false);
+  });
+});
