@@ -1,0 +1,5 @@
+.hyperframes/
+review/
+renders/
+# Rebuilt exactly by: python3 -I tools/make_audio.py
+assets/audio/*.wav

@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <title>OPUS promo</title>
+    <script src="assets/vendor/gsap.min.js"></script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1080px; height: 1920px; overflow: hidden; background: #04070c; }
+      :root {
+        --bg: #04070c;
+        --ink: #eaf6ff;
+        --dim: #7f97ab;
+        --cyan: #3ad8ff;
+        --cyan-deep: #0b6f8f;
+        --amber: #ffb547;
+        --green: #5dffb0;
+        --display: "Montserrat", sans-serif;
+        --mono: "JetBrains Mono", monospace;
+      }
+      #root { position: relative; width: 100%; height: 100%; overflow: hidden; color: var(--ink); font-family: var(--display); }
+
+      /* ---------- persistent background ---------- */
+      #bg { position: absolute; inset: 0; }
+      .bg-glow { position: absolute; inset: 0; background: radial-gradient(ellipse 70% 45% at 50% 42%, rgba(58, 216, 255, 0.16), rgba(4, 7, 12, 0) 70%); }
+      .bg-grid { position: absolute; inset: -80px; background-image: linear-gradient(rgba(58, 216, 255, 0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(58, 216, 255, 0.07) 1px, transparent 1px); background-size: 80px 80px; }
+      .bg-vignette { position: absolute; inset: 0; background: radial-gradient(ellipse 85% 70% at 50% 50%, rgba(4, 7, 12, 0) 55%, rgba(4, 7, 12, 0.92) 100%); }
+      .bg-scan { position: absolute; left: 0; right: 0; top: 0; height: 260px; background: linear-gradient(180deg, rgba(58, 216, 255, 0), rgba(58, 216, 255, 0.07), rgba(58, 216, 255, 0)); }
+      .hud-corner { position: absolute; width: 90px; height: 90px; border-color: rgba(58, 216, 255, 0.55); border-style: solid; border-width: 0; }
+      .hud-corner.tl { left: 48px; top: 120px; border-top-width: 3px; border-left-width: 3px; }
+      .hud-corner.tr { right: 48px; top: 120px; border-top-width: 3px; border-right-width: 3px; }
+      .hud-corner.bl { left: 48px; bottom: 120px; border-bottom-width: 3px; border-left-width: 3px; }
+      .hud-corner.br { right: 48px; bottom: 120px; border-bottom-width: 3px; border-right-width: 3px; }
+      .hud-tag { position: absolute; font-family: var(--mono); font-size: 22px; letter-spacing: 0.18em; color: rgba(127, 151, 171, 0.9); }
+      .hud-tag.top { left: 160px; top: 132px; }
+      .hud-tag.bottom { right: 160px; bottom: 132px; }
+      .dot { position: absolute; width: 4px; height: 4px; border-radius: 50%; background: var(--cyan); }
+
+      /* ---------- scenes ---------- */
+      .scene { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 260px 80px 360px; text-align: center; }
+      .mono { font-family: var(--mono); }
+      .kicker { font-family: var(--mono); font-size: 30px; letter-spacing: 0.32em; color: var(--cyan); text-transform: uppercase; }
+      .headline { font-weight: 900; font-size: 104px; line-height: 1.02; letter-spacing: -0.035em; }
+      .sub { font-family: var(--mono); font-size: 34px; color: var(--dim); letter-spacing: 0.02em; }
+      .cyan { color: var(--cyan); }
+      .amber { color: var(--amber); }
+
+      /* S1 boot */
+      #s1-core { position: relative; width: 640px; height: 640px; display: flex; align-items: center; justify-content: center; }
+      #s1-core svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+      #s1-word { font-weight: 900; font-size: 196px; letter-spacing: 0.06em; line-height: 1; text-shadow: 0 0 40px rgba(58, 216, 255, 0.55); }
+      #s1-meet { font-family: var(--mono); font-size: 40px; letter-spacing: 0.4em; color: var(--dim); margin-bottom: 40px; }
+      #s1-status { display: block; margin-top: 60px; }
+
+      /* S2 acronym */
+      .acro { display: flex; flex-direction: column; gap: 30px; align-items: flex-start; }
+      .acro-row { display: flex; align-items: baseline; gap: 4px; }
+      .acro-letter { display: block; width: 130px; font-weight: 900; font-size: 160px; line-height: 0.9; color: var(--cyan); text-shadow: 0 0 30px rgba(58, 216, 255, 0.5); text-align: left; }
+      .acro-word { display: block; font-weight: 400; font-size: 92px; letter-spacing: -0.01em; color: var(--ink); }
+      #s2-tag { margin-top: 80px; }
+
+      /* S3 phone */
+      #s3-head { margin-bottom: 50px; }
+      #phone { position: relative; width: 680px; height: 820px; border-radius: 64px; border: 3px solid rgba(58, 216, 255, 0.55); background: linear-gradient(180deg, rgba(14, 26, 38, 0.95), rgba(6, 12, 20, 0.95)); box-shadow: 0 0 80px rgba(58, 216, 255, 0.18); padding: 110px 40px 40px; display: flex; flex-direction: column; gap: 28px; }
+      #phone-top { position: absolute; top: 34px; left: 0; right: 0; display: flex; justify-content: center; }
+      #phone-top span { font-family: var(--mono); font-size: 24px; color: var(--dim); letter-spacing: 0.2em; }
+      .bubble { display: block; max-width: 520px; padding: 28px 34px; border-radius: 34px; font-family: var(--display); font-size: 40px; line-height: 1.25; text-align: left; }
+      .bubble.me { align-self: flex-end; background: var(--cyan); color: #022231; font-weight: 700; border-bottom-right-radius: 10px; }
+      .bubble.opus { align-self: flex-start; background: rgba(58, 216, 255, 0.1); border: 2px solid rgba(58, 216, 255, 0.45); color: var(--ink); border-bottom-left-radius: 10px; }
+      .bubble .ev { display: block; }
+      .bubble .label { display: block; font-family: var(--mono); font-size: 20px; letter-spacing: 0.2em; color: var(--cyan); margin-bottom: 8px; }
+      #s3-slot { position: relative; align-self: flex-start; }
+      .typing { position: absolute; left: 0; top: 0; display: flex; gap: 12px; padding: 26px 32px; border-radius: 34px; background: rgba(58, 216, 255, 0.1); border: 2px solid rgba(58, 216, 255, 0.3); }
+      .typing i { display: block; width: 16px; height: 16px; border-radius: 50%; background: var(--cyan); }
+
+      /* S4 capabilities */
+      #s4-head { margin-bottom: 70px; }
+      .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; width: 900px; }
+      .tile { display: flex; flex-direction: column; align-items: flex-start; gap: 22px; padding: 38px 34px; border-radius: 28px; background: rgba(58, 216, 255, 0.06); border: 2px solid rgba(58, 216, 255, 0.35); text-align: left; min-height: 250px; }
+      .tile svg { width: 76px; height: 76px; stroke: var(--cyan); fill: none; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+      .tile b { display: block; font-weight: 900; font-size: 40px; line-height: 1.05; letter-spacing: -0.02em; }
+      .tile span { display: block; font-family: var(--mono); font-size: 28px; color: var(--dim); }
+
+      /* S5 ask first */
+      #s5-head { margin-bottom: 60px; }
+      .chat { display: flex; flex-direction: column; gap: 30px; width: 860px; }
+      .chat .bubble { max-width: 700px; font-size: 40px; }
+      #s5-lockrow { display: flex; align-items: center; justify-content: center; gap: 36px; margin-top: 56px; height: 140px; }
+      #s5-lock { width: 120px; height: 140px; }
+      #s5-lock path, #s5-lock rect { stroke: var(--amber); fill: none; stroke-width: 6; stroke-linecap: round; }
+      #s5-sent { display: block; font-weight: 900; font-size: 84px; color: var(--green); letter-spacing: -0.02em; }
+      #s5-rule { margin-top: 50px; }
+
+      /* S6 shield */
+      #s6-shield { width: 260px; height: 300px; margin-bottom: 60px; }
+      #s6-shield path { stroke: var(--cyan); fill: rgba(58, 216, 255, 0.08); stroke-width: 5; stroke-linejoin: round; }
+      .checks { display: flex; flex-direction: column; gap: 44px; align-items: flex-start; width: 940px; }
+      .check { display: flex; align-items: center; gap: 30px; }
+      .check svg { flex: none; width: 64px; height: 64px; stroke: var(--green); fill: none; stroke-width: 6; stroke-linecap: round; stroke-linejoin: round; }
+      .check b { display: block; font-weight: 900; font-size: 54px; letter-spacing: -0.03em; text-align: left; line-height: 1.05; }
+
+      /* S7 kinetic */
+      .kin { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 0 80px; }
+      .kin b { display: block; font-weight: 900; font-size: 128px; line-height: 1; letter-spacing: -0.04em; text-align: center; }
+      #s7-c b { font-size: 260px; color: var(--cyan); text-shadow: 0 0 60px rgba(58, 216, 255, 0.6); }
+
+      /* S8 CTA */
+      #s8-core { position: relative; width: 560px; height: 560px; display: flex; align-items: center; justify-content: center; margin-bottom: 50px; }
+      #s8-core svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+      #s8-word { font-weight: 900; font-size: 170px; letter-spacing: 0.06em; text-shadow: 0 0 40px rgba(58, 216, 255, 0.6); }
+      #s8-full { display: block; font-family: var(--mono); font-size: 27px; letter-spacing: 0.16em; color: var(--dim); margin-bottom: 44px; }
+      #s8-line { font-weight: 900; font-size: 66px; line-height: 1.08; letter-spacing: -0.03em; margin-bottom: 64px; max-width: 900px; }
+      #s8-line .ln { display: block; }
+      #s8-btn { display: inline-flex; align-items: center; justify-content: center; padding: 34px 70px; border-radius: 999px; background: var(--cyan); color: #022231; font-weight: 900; font-size: 50px; letter-spacing: -0.01em; box-shadow: 0 0 60px rgba(58, 216, 255, 0.55); }
+      #s8-contact { margin-top: 40px; font-family: var(--mono); font-size: 34px; color: var(--ink); letter-spacing: 0.06em; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="42" data-width="1080" data-height="1920">
+      <!-- Background: runs the whole film -->
+      <div id="bg" class="clip" data-start="0" data-duration="42" data-track-index="0">
+        <div class="bg-glow" id="bg-glow"></div>
+        <div class="bg-grid" id="bg-grid"></div>
+        <div class="bg-scan" id="bg-scan"></div>
+        <div id="dots"></div>
+        <div class="bg-vignette"></div>
+        <div class="hud-corner tl"></div>
+        <div class="hud-corner tr"></div>
+        <div class="hud-corner bl"></div>
+        <div class="hud-corner br"></div>
+        <div class="hud-tag top">OPUS // ONLINE</div>
+        <div class="hud-tag bottom" id="hud-clock">SYS 01</div>
+      </div>
+
+      <!-- S1 boot 0-4 -->
+      <section id="s1" class="scene clip" data-start="0" data-duration="4" data-track-index="1">
+        <div id="s1-meet">MEET</div>
+        <div id="s1-core">
+          <svg viewBox="0 0 640 640">
+            <circle id="s1-r1" cx="320" cy="320" r="300" stroke="#3ad8ff" stroke-opacity="0.35" stroke-width="2" fill="none" stroke-dasharray="1885" stroke-dashoffset="1885" />
+            <circle id="s1-r2" cx="320" cy="320" r="262" stroke="#3ad8ff" stroke-width="6" fill="none" stroke-dasharray="40 22" stroke-opacity="0.8" />
+            <circle id="s1-r3" cx="320" cy="320" r="222" stroke="#3ad8ff" stroke-opacity="0.5" stroke-width="2" fill="none" stroke-dasharray="1395" stroke-dashoffset="1395" />
+          </svg>
+          <div id="s1-word">OPUS</div>
+        </div>
+        <div id="s1-status" class="kicker">System online</div>
+      </section>
+
+      <!-- S2 acronym 4-8 -->
+      <section id="s2" class="scene clip" data-start="4" data-duration="4" data-track-index="1">
+        <div class="acro">
+          <div class="acro-row" id="a1"><span class="acro-letter">O</span><span class="acro-word">mniPotent</span></div>
+          <div class="acro-row" id="a2"><span class="acro-letter">P</span><span class="acro-word">ersonal</span></div>
+          <div class="acro-row" id="a3"><span class="acro-letter">U</span><span class="acro-word">tility</span></div>
+          <div class="acro-row" id="a4"><span class="acro-letter">S</span><span class="acro-word">ystem</span></div>
+        </div>
+        <div id="s2-tag" class="sub">Your private AI assistant.</div>
+      </section>
+
+      <!-- S3 phone 8-14 -->
+      <section id="s3" class="scene clip" data-start="8" data-duration="6" data-track-index="1">
+        <div id="s3-head">
+          <div class="headline" id="s3-h1">One number.</div>
+          <div class="headline cyan" id="s3-h2">Call it. Text it.</div>
+        </div>
+        <div id="phone">
+          <div id="phone-top"><span>OPUS</span></div>
+          <div class="bubble me" id="s3-b1">What's on my calendar tomorrow?</div>
+          <div id="s3-slot">
+            <div class="typing" id="s3-typing"><i></i><i></i><i></i></div>
+            <div class="bubble opus" id="s3-b2"><span class="label">OPUS</span>On it. Checking now.</div>
+          </div>
+          <div class="bubble opus" id="s3-b3"><span class="label">OPUS · TOMORROW</span><span class="ev">9:00 Dentist</span><span class="ev">1:00 Lunch with Ana</span><span class="ev">4:30 Call with Sam</span></div>
+        </div>
+      </section>
+
+      <!-- S4 capabilities 14-22 -->
+      <section id="s4" class="scene clip" data-start="14" data-duration="8" data-track-index="1">
+        <div id="s4-head">
+          <div class="kicker">Just ask</div>
+          <div class="headline" style="font-size: 92px">It does the work.</div>
+        </div>
+        <div class="grid">
+          <div class="tile" id="t1">
+            <svg viewBox="0 0 64 64"><rect x="8" y="12" width="48" height="44" rx="6" /><path d="M8 24h48M20 6v12M44 6v12M18 34h8M30 34h8M42 34h4M18 44h8M30 44h8" /></svg>
+            <b>Your calendar</b><span>Check it. Add to it.</span>
+          </div>
+          <div class="tile" id="t2">
+            <svg viewBox="0 0 64 64"><rect x="6" y="14" width="52" height="36" rx="5" /><path d="M8 16l24 19 24-19" /></svg>
+            <b>Your inbox</b><span>Summed up for you.</span>
+          </div>
+          <div class="tile" id="t3">
+            <svg viewBox="0 0 64 64"><path d="M10 14h44a4 4 0 0 1 4 4v24a4 4 0 0 1-4 4H26l-12 10V46h-4a4 4 0 0 1-4-4V18a4 4 0 0 1 4-4z" /><path d="M20 28h24M20 36h14" /></svg>
+            <b>Texts for you</b><span>Signed with your name.</span>
+          </div>
+          <div class="tile" id="t4">
+            <svg viewBox="0 0 64 64"><circle cx="32" cy="22" r="10" /><path d="M12 56c2-11 10-17 20-17s18 6 20 17" /></svg>
+            <b>Contacts</b><span>"Text Sam." Done.</span>
+          </div>
+          <div class="tile" id="t5">
+            <svg viewBox="0 0 64 64"><circle cx="27" cy="27" r="17" /><path d="M40 40l16 16" /></svg>
+            <b>Research</b><span>Answers with sources.</span>
+          </div>
+          <div class="tile" id="t6">
+            <svg viewBox="0 0 64 64"><path d="M6 30L58 8 44 56 30 36z" /><path d="M30 36L58 8" /></svg>
+            <b>Emails sent</b><span>Only on your OK.</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- S5 ask first 22-28 -->
+      <section id="s5" class="scene clip" data-start="22" data-duration="6" data-track-index="1">
+        <div id="s5-head">
+          <div class="headline">It asks</div>
+          <div class="headline amber">before it acts.</div>
+        </div>
+        <div class="chat">
+          <div class="bubble opus" id="s5-b1"><span class="label">OPUS</span>I'll text Sam: "Running 10 min late." Say yes and your code word.</div>
+          <div class="bubble me" id="s5-b2">Yes. ••••••</div>
+        </div>
+        <div id="s5-lockrow">
+          <svg id="s5-lock" viewBox="0 0 120 140"><path id="s5-shackle" d="M30 64V40a30 30 0 0 1 60 0v24" /><rect x="14" y="64" width="92" height="66" rx="12" /></svg>
+          <span id="s5-sent">Sent.</span>
+        </div>
+        <div id="s5-rule" class="sub">Your code word. Your rules.</div>
+      </section>
+
+      <!-- S6 shield 28-32 -->
+      <section id="s6" class="scene clip" data-start="28" data-duration="4" data-track-index="1">
+        <svg id="s6-shield" viewBox="0 0 260 300"><path d="M130 12l106 40v86c0 72-46 124-106 150C70 262 24 210 24 138V52z" /></svg>
+        <div class="checks">
+          <div class="check" id="c1"><svg viewBox="0 0 64 64"><path d="M12 34l13 13 27-30" /></svg><b>Strangers get nothing.</b></div>
+          <div class="check" id="c2"><svg viewBox="0 0 64 64"><path d="M12 34l13 13 27-30" /></svg><b>Scam emails screened first.</b></div>
+          <div class="check" id="c3"><svg viewBox="0 0 64 64"><path d="M12 34l13 13 27-30" /></svg><b>Every action logged.</b></div>
+        </div>
+      </section>
+
+      <!-- S7 kinetic 32-36 -->
+      <section id="s7" class="clip" data-start="32" data-duration="4" data-track-index="1" style="position: absolute; inset: 0">
+        <div class="kin" id="s7-a"><b>Stop juggling apps.</b></div>
+        <div class="kin" id="s7-b"><b>Just say it.</b></div>
+        <div class="kin" id="s7-c"><b>Done.</b></div>
+      </section>
+
+      <!-- S8 CTA 36-42 -->
+      <section id="s8" class="scene clip" data-start="36" data-duration="6" data-track-index="1">
+        <div id="s8-core">
+          <svg viewBox="0 0 560 560">
+            <circle id="s8-r1" cx="280" cy="280" r="262" stroke="#3ad8ff" stroke-opacity="0.35" stroke-width="2" fill="none" />
+            <circle id="s8-r2" cx="280" cy="280" r="228" stroke="#3ad8ff" stroke-width="6" fill="none" stroke-dasharray="40 22" stroke-opacity="0.8" />
+            <circle id="s8-r3" cx="280" cy="280" r="192" stroke="#3ad8ff" stroke-opacity="0.5" stroke-width="2" fill="none" />
+          </svg>
+          <div id="s8-word">OPUS</div>
+        </div>
+        <div id="s8-full">OMNIPOTENT PERSONAL UTILITY SYSTEM</div>
+        <div id="s8-line"><span class="ln">Your AI assistant.</span><span class="ln cyan">One call away.</span></div>
+        <div id="s8-btn">Book your setup</div>
+        <div id="s8-contact">YOUR-LINK-HERE.COM</div>
+      </section>
+
+      <audio id="music" src="assets/audio/music.wav" data-start="0" data-duration="42" data-track-index="5" data-volume="0.9"></audio>
+      <audio id="sfx" src="assets/audio/sfx.wav" data-start="0" data-duration="42" data-track-index="6" data-volume="0.8"></audio>
+    </div>
+
+    <script>
+      // Seeded random so particles land in the same place every render.
+      let seed = 1968;
+      const rand = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+      const dots = document.getElementById("dots");
+      for (let i = 0; i < 46; i++) {
+        const d = document.createElement("div");
+        d.className = "dot";
+        d.id = "dot" + i;
+        d.style.left = Math.round(rand() * 1060) + "px";
+        d.style.top = Math.round(rand() * 1900) + "px";
+        d.style.opacity = (0.15 + rand() * 0.5).toFixed(2);
+        dots.appendChild(d);
+      }
+
+      const tl = gsap.timeline({ paused: true });
+      const E = "power3.out";
+
+      // ---- background, whole film ----
+      tl.fromTo("#bg-grid", { y: 0 }, { y: 80, duration: 42, ease: "none" }, 0);
+      tl.fromTo("#bg-scan", { y: -260 }, { y: 1920, duration: 6, ease: "none", repeat: 6 }, 0);
+      tl.fromTo("#dots", { y: 0 }, { y: -120, duration: 42, ease: "none" }, 0);
+      tl.fromTo("#bg-glow", { opacity: 0.4 }, { opacity: 1, duration: 2.5, ease: "power2.out" }, 0);
+      tl.fromTo("#bg-glow", { scale: 1 }, { scale: 1.25, duration: 0.5, ease: "power2.out", yoyo: true, repeat: 1 }, 36);
+
+      // ---- S1 boot (0-4) ----
+      tl.fromTo("#s1-r1", { attr: { "stroke-dashoffset": 1885 } }, { attr: { "stroke-dashoffset": 0 }, duration: 1.4, ease: "power2.inOut" }, 0.1);
+      tl.fromTo("#s1-r3", { attr: { "stroke-dashoffset": 1395 } }, { attr: { "stroke-dashoffset": 0 }, duration: 1.2, ease: "power2.inOut" }, 0.4);
+      tl.fromTo("#s1-r2", { opacity: 0, rotation: -90, transformOrigin: "50% 50%" }, { opacity: 1, rotation: 90, duration: 4, ease: "power1.out" }, 0.2);
+      tl.fromTo("#s1-status", { opacity: 0, scale: 1.12 }, { opacity: 1, scale: 1, duration: 0.7, ease: E }, 1.1);
+      tl.fromTo("#s1-meet", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5, ease: E }, 2.0);
+      tl.fromTo("#s1-word", { opacity: 0, scale: 1.6, filter: "blur(18px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.45, ease: "expo.out" }, 2.5);
+      tl.fromTo("#s1-core", { scale: 1 }, { scale: 1.05, duration: 1.2, ease: "power1.out" }, 2.5);
+      tl.to("#s1", { opacity: 0, duration: 0.3, ease: "power2.in" }, 3.7);
+
+      // ---- S2 acronym (4-8) ----
+      ["#a1", "#a2", "#a3", "#a4"].forEach((id, i) => {
+        const at = 4.4 + i * 0.6;
+        tl.fromTo(id + " .acro-letter", { opacity: 0, x: -60 }, { opacity: 1, x: 0, duration: 0.4, ease: "expo.out" }, at);
+        tl.fromTo(id + " .acro-word", { opacity: 0, clipPath: "inset(0 100% 0 0)" }, { opacity: 1, clipPath: "inset(0 0% 0 0)", duration: 0.5, ease: E }, at + 0.1);
+      });
+      tl.fromTo("#s2-tag", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.6, ease: E }, 6.8);
+      tl.to("#s2", { opacity: 0, duration: 0.3, ease: "power2.in" }, 7.7);
+
+      // ---- S3 phone (8-14) ----
+      tl.fromTo("#s3-h1", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.5, ease: E }, 8.15);
+      tl.fromTo("#s3-h2", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.5, ease: E }, 8.75);
+      tl.fromTo("#phone", { opacity: 0, y: 220 }, { opacity: 1, y: 0, duration: 0.8, ease: "expo.out" }, 9.2);
+      tl.fromTo("#s3-b1", { opacity: 0, y: 30, scale: 0.9 }, { opacity: 1, y: 0, scale: 1, duration: 0.35, ease: "back.out(1.6)" }, 10.0);
+      tl.fromTo("#s3-typing", { opacity: 0 }, { opacity: 1, duration: 0.2 }, 10.6);
+      tl.fromTo("#s3-typing i", { y: 0 }, { y: -10, duration: 0.2, ease: "sine.inOut", yoyo: true, repeat: 3, stagger: 0.1 }, 10.6);
+      tl.to("#s3-typing", { opacity: 0, duration: 0.15 }, 11.5);
+      tl.fromTo("#s3-b2", { opacity: 0, y: 30, scale: 0.9 }, { opacity: 1, y: 0, scale: 1, duration: 0.35, ease: "back.out(1.6)" }, 11.6);
+      tl.fromTo("#s3-b3", { opacity: 0, y: 30, scale: 0.9 }, { opacity: 1, y: 0, scale: 1, duration: 0.35, ease: "back.out(1.6)" }, 12.6);
+      tl.to("#s3", { opacity: 0, duration: 0.3, ease: "power2.in" }, 13.7);
+
+      // ---- S4 capabilities (14-22) ----
+      tl.fromTo("#s4-head", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.6, ease: E }, 14.15);
+      ["#t1", "#t2", "#t3", "#t4", "#t5", "#t6"].forEach((id, i) => {
+        const at = 15.0 + i * 0.9;
+        tl.fromTo(id, { opacity: 0, y: 50, scale: 0.92 }, { opacity: 1, y: 0, scale: 1, duration: 0.45, ease: "back.out(1.4)" }, at);
+        tl.fromTo(id, { borderColor: "rgba(58, 216, 255, 1)" }, { borderColor: "rgba(58, 216, 255, 0.35)", duration: 0.8, ease: "power2.out" }, at + 0.1);
+      });
+      tl.to("#s4", { opacity: 0, duration: 0.3, ease: "power2.in" }, 21.7);
+
+      // ---- S5 ask first (22-28) ----
+      tl.fromTo("#s5-head", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.6, ease: E }, 22.15);
+      tl.fromTo("#s5-b1", { opacity: 0, y: 30, scale: 0.92 }, { opacity: 1, y: 0, scale: 1, duration: 0.4, ease: "back.out(1.5)" }, 23.0);
+      tl.fromTo("#s5-b2", { opacity: 0, y: 30, scale: 0.92 }, { opacity: 1, y: 0, scale: 1, duration: 0.4, ease: "back.out(1.5)" }, 24.6);
+      tl.fromTo("#s5-lock", { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.35, ease: "back.out(2)" }, 24.9);
+      tl.fromTo("#s5-shackle", { y: -16 }, { y: 0, duration: 0.15, ease: "power4.in" }, 25.3);
+      tl.fromTo("#s5-sent", { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.35, ease: "expo.out" }, 26.0);
+      tl.fromTo("#s5-rule", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5, ease: E }, 26.4);
+      tl.to("#s5", { opacity: 0, duration: 0.3, ease: "power2.in" }, 27.7);
+
+      // ---- S6 shield (28-32) ----
+      tl.fromTo("#s6-shield", { opacity: 0, scale: 0.7 }, { opacity: 1, scale: 1, duration: 0.5, ease: "back.out(1.6)" }, 28.05);
+      ["#c1", "#c2", "#c3"].forEach((id, i) => {
+        tl.fromTo(id, { opacity: 0, x: -50 }, { opacity: 1, x: 0, duration: 0.45, ease: "expo.out" }, 28.4 + i * 0.8);
+      });
+      tl.to("#s6", { opacity: 0, duration: 0.3, ease: "power2.in" }, 31.7);
+
+      // ---- S7 kinetic (32-36) ----
+      tl.fromTo("#s7-a", { opacity: 0, scale: 1.15 }, { opacity: 1, scale: 1, duration: 0.35, ease: "expo.out" }, 32.1);
+      tl.to("#s7-a", { opacity: 0, y: -60, duration: 0.25, ease: "power2.in" }, 33.2);
+      tl.fromTo("#s7-b", { opacity: 0, scale: 1.15 }, { opacity: 1, scale: 1, duration: 0.35, ease: "expo.out" }, 33.4);
+      tl.to("#s7-b", { opacity: 0, y: -60, duration: 0.25, ease: "power2.in" }, 34.4);
+      tl.fromTo("#s7-c", { opacity: 0, scale: 2.2 }, { opacity: 1, scale: 1, duration: 0.3, ease: "expo.out" }, 34.6);
+      tl.to("#s7-c", { opacity: 0, scale: 0.9, duration: 0.25, ease: "power2.in" }, 35.7);
+
+      // ---- S8 CTA (36-42) ----
+      tl.fromTo("#s8-word", { opacity: 0, scale: 1.5, filter: "blur(16px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.5, ease: "expo.out" }, 36.0);
+      tl.fromTo("#s8-r2", { rotation: 0, transformOrigin: "50% 50%" }, { rotation: 120, duration: 6, ease: "power1.out" }, 36.0);
+      tl.fromTo("#s8-core", { scale: 0.85, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.6, ease: "expo.out" }, 36.0);
+      tl.fromTo("#s8-full", { opacity: 0, scale: 1.1 }, { opacity: 1, scale: 1, duration: 0.7, ease: E }, 36.6);
+      tl.fromTo("#s8-line", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.6, ease: E }, 37.2);
+      tl.fromTo("#s8-btn", { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.5, ease: "back.out(1.8)" }, 38.2);
+      tl.fromTo("#s8-btn", { boxShadow: "0 0 60px rgba(58, 216, 255, 0.55)" }, { boxShadow: "0 0 110px rgba(58, 216, 255, 0.9)", duration: 0.8, ease: "sine.inOut", yoyo: true, repeat: 2 }, 38.8);
+      tl.fromTo("#s8-contact", { opacity: 0 }, { opacity: 1, duration: 0.5, ease: E }, 38.6);
+
+      window.__timelines["main"] = tl;
+      tl.seek(0);
+    </script>
+  </body>
+</html>
