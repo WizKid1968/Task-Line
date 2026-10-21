@@ -36,11 +36,15 @@ new app. Written October 2026. Update this page whenever an app or rule changes.
    writes there. Your personal or business data lives in separate bases.
 5. **Short website list.** The worker's environment allows only package managers and
    the Task-Line server. Add a website only when a job needs it.
-6. **Everything is logged.** Every call, text, approval, job and result goes to the
+6. **Spot and report tricks.** The worker looks for hidden text (white or tiny font,
+   off-screen text, invisible characters) and any other attempt to give it orders,
+   refuses to follow it, and puts a warning at the top of its result text. This is an
+   extra layer on top of rules 1 to 5, not a replacement.
+7. **Everything is logged.** Every call, text, approval, job and result goes to the
    Airtable Activity Log and Jobs table.
-7. **Secrets never travel through chat.** Passwords, tokens and code words go straight
+8. **Secrets never travel through chat.** Passwords, tokens and code words go straight
    into Vercel or environment settings. Nobody pastes them into a conversation.
-8. **Strangers get nothing.** Unknown numbers get one fixed sentence. People you texted
+9. **Strangers get nothing.** Unknown numbers get one fixed sentence. People you texted
    can only reply (passed to you) for 24 hours. Neither can start jobs.
 
 ## Checklist before connecting a new app
