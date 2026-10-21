@@ -10,7 +10,7 @@ spent yet.** Rudy approves the plan, then style frames, then the render.
 - Upgrade the visuals: "mind-blowing", cinematic motion graphics. Use **Higgsfield** to
   create assets, composited and animated with **HyperFrames**.
 - Add a **voice-over** made with **Fish Audio, free model S2.1 Pro** (`s2.1-pro-free`).
-  Rudy will supply the Fish voice ID to use (not received yet).
+  Voice: `d0da4f95891148c4b08f8c7e6eaeb427` ("Young Enthusiast").
 - **No tech talk.** Show what Opus is and what it does for a normal person:
   - a personal AI assistant, **no download**, all you need is a phone number;
   - call it or text it and it handles things for you, everyday tasks through to
@@ -21,7 +21,7 @@ spent yet.** Rudy approves the plan, then style frames, then the render.
 
 ## Open decisions (ask Rudy before building)
 
-1. **Fish voice ID** — Rudy will send it.
+1. **Fish voice ID** — chosen: `d0da4f95891148c4b08f8c7e6eaeb427` ("Young Enthusiast", young energetic male). Tested, free.
 2. **"Ordering lunch"** — Opus can't do this today: ordering needs payment, and Rudy's own
    safety rule is that Opus never touches money. Options: (a) leave out; (b) reword to
    something real, e.g. "finds the best lunch spot near you and texts you the menu";
