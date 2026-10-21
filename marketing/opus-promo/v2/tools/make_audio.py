@@ -20,7 +20,7 @@ MUSIC_START = 15.2  # the track's drop (0:28) lands on "Here's how it works" at 
 rng = np.random.default_rng(7)
 
 VOICE = [  # (line file, place at seconds)
-    ("l1", 0.4), ("l2", 4.2), ("l3", 13.0), ("l4", 14.8), ("l5", 19.4), ("l6", 24.2),
+    ("l1", 0.2), ("l2", 4.2), ("l3", 13.0), ("l4", 14.8), ("l5", 19.4), ("l6", 24.2),
     ("l7", 29.4), ("l8", 37.5), ("l9", 44.0), ("l10", 48.7), ("l11", 55.1), ("l12", 57.4),
 ]
 
@@ -98,8 +98,11 @@ def chime():
 
 for at in [4.0, 12.8, 14.6, 29.2, 37.3, 43.8, 48.5, 54.9, 57.2]:
     place(sfx, whoosh(), at - 0.2, 0.5)
-for at in [16.0, 20.7, 25.2, 26.6, 30.6, 38.8, 44.9]:   # message bubbles
+for at in [17.5, 20.7, 25.2, 26.6, 30.6, 38.8, 44.9]:   # message bubbles
     place(sfx, pop(), at, 0.5)
+for at, f in [(15.8, 880), (15.95, 1175)]:             # call connects (two soft beeps)
+    n = int(0.12 * SR)
+    place(sfx, np.sin(2 * math.pi * f * t_axis(n)) * np.exp(-t_axis(n) * 18), at, 0.5)
 for at in [27.4, 35.9, 42.5, 47.2, 59.8]:               # done / result / button
     place(sfx, chime(), at, 0.35)
 sfx /= np.max(np.abs(sfx)) or 1
