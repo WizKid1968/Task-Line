@@ -15,7 +15,7 @@ SR = 44100
 DUR = 80.0
 N = int(SR * DUR)
 ROOT = Path(__file__).resolve().parent.parent
-MUSIC = ROOT / "assets" / "music" / "southern-techno.mp3"
+MUSIC = ROOT / "assets" / "music" / "southern-techno-2.mp3"
 MUSIC_START = 15.2  # the track's drop (0:28) lands on "Here's how it works" at 12.8 s (80 s excerpt)
 rng = np.random.default_rng(7)
 
