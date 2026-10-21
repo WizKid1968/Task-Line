@@ -70,9 +70,11 @@
       #st-track { position: absolute; left: 72px; right: 72px; top: 220px; display: flex; gap: 18px; }
       #st-track div { flex: 1; text-align: center; padding: 16px 10px; border: 4px solid var(--ink); border-radius: 999px; font-size: 32px; font-weight: 600; background: #fff; }
       .sth { top: 330px; font-size: 92px; opacity: 0; }
-      #st-phone { position: absolute; left: 150px; top: 560px; width: 780px; height: 1000px; border-radius: 80px; background: #fff; border: 6px solid var(--ink); box-shadow: 16px 16px 0 var(--ink); padding: 110px 40px 40px; display: flex; flex-direction: column; gap: 26px; }
+      #st-phone { position: absolute; left: 150px; top: 560px; width: 780px; height: 1000px; border-radius: 80px; background: #fff; border: 6px solid var(--ink); box-shadow: 16px 16px 0 var(--ink); padding: 110px 40px 40px; display: flex; flex-direction: column; gap: 22px; overflow: hidden; }
       #st-phone .notch { position: absolute; left: 50%; top: 28px; width: 190px; height: 44px; margin-left: -95px; border-radius: 22px; background: var(--ink); }
-      .bub { display: block; max-width: 600px; padding: 24px 30px; border-radius: 36px; font-size: 40px; line-height: 1.2; font-weight: 500; }
+      #msgwin { position: relative; flex: 1; overflow: hidden; }
+      #msgs { display: flex; flex-direction: column; gap: 22px; }
+      .bub { display: block; max-width: 600px; padding: 20px 28px; border-radius: 34px; font-size: 36px; line-height: 1.2; font-weight: 500; }
       .bub.me { align-self: flex-end; background: var(--cobalt); color: #fff; border-bottom-right-radius: 10px; }
       .bub.op { align-self: flex-start; background: var(--grey); border-bottom-left-radius: 10px; }
       .bub small { display: block; font-family: var(--mono); font-size: 22px; color: var(--cobalt); margin-bottom: 6px; font-weight: 700; letter-spacing: 0.1em; }
@@ -138,7 +140,7 @@
     </style>
   </head>
   <body>
-    <div id="root" data-composition-id="main" data-start="0" data-duration="65" data-width="1080" data-height="1920">
+    <div id="root" data-composition-id="main" data-start="0" data-duration="80" data-width="1080" data-height="1920">
 
       <!-- S1 hook 0-4 -->
       <section id="s1" class="scene clip" data-start="0" data-duration="4" data-track-index="1">
@@ -173,8 +175,8 @@
         <img class="px" id="s3-m" src="assets/mascot/cheer.png" alt="" />
       </section>
 
-      <!-- S4 the three steps, one phone 14.6-29.2 -->
-      <section id="st" class="scene clip" data-start="14.6" data-duration="14.6" data-track-index="1">
+      <!-- S4 the three steps, one phone 14.6-44 -->
+      <section id="st" class="scene clip" data-start="14.6" data-duration="29.4" data-track-index="1">
         <div class="fill"></div>
         <div class="label">// 02 · how it works</div>
         <div id="st-track"><div id="tr1">1 · Call or text</div><div id="tr2">2 · It checks</div><div id="tr3">3 · Done</div></div>
@@ -183,81 +185,85 @@
         <div class="head sth" id="sh3">Say yes. It's done.</div>
         <div id="st-phone">
           <div class="notch"></div>
-          <div id="callbar" class="w" data-t="15.80"><svg viewBox="0 0 24 24" class="ic"><path d="M5 3h4l2 5-3 2a12 12 0 0 0 6 6l2-3 5 2v4a2 2 0 0 1-2 2A18 18 0 0 1 3 5a2 2 0 0 1 2-2z" /></svg><span>On a call with Opus</span><div class="wave"><u></u><u></u><u></u><u></u><u></u><u></u><u></u></div></div>
-          <div class="bub me w" data-t="17.50"><small class="said">YOU SAID</small>Order lunch for the team. 12 people, Thai, by 12:30.</div>
-          <div class="bub op w" data-t="20.70"><small>OPUS SAID</small>Got it! Thai Garden: 12 lunches, arriving 12:30. Should I order?</div>
-          <div class="bub me w" data-t="25.20">Yes</div>
-          <div class="done w" data-t="26.60"><b>✓</b>Ordered · arriving 12:30</div>
+          <div id="callbar" class="w" data-t="18.90"><svg viewBox="0 0 24 24" class="ic"><path d="M5 3h4l2 5-3 2a12 12 0 0 0 6 6l2-3 5 2v4a2 2 0 0 1-2 2A18 18 0 0 1 3 5a2 2 0 0 1 2-2z" /></svg><span>On a call with Opus</span><div class="wave"><u></u><u></u><u></u><u></u><u></u><u></u><u></u></div></div>
+          <div id="msgwin"><div id="msgs">
+            <div class="bub op w" data-t="19.30"><small>OPUS</small>Hi, this is Opus! What can I do for you?</div>
+            <div class="bub me w" data-t="22.40"><small class="said">YOU</small>Order lunch for the team. 12 people, Thai, by 12:30.</div>
+            <div class="bub op w" data-t="32.20"><small>OPUS</small>Got it. Thai Garden, 12 lunches, arriving at 12:30. Should I order?</div>
+            <div class="bub me w" data-t="39.20"><small class="said">YOU</small>Yes, please.</div>
+            <div class="bub op w" data-t="40.40"><small>OPUS</small>Done! I'll text you when it's on the way.</div>
+            <div class="done w" data-t="42.80"><b>✓</b>Text from Opus: ordered, arriving 12:30</div>
+          </div></div>
         </div>
       </section>
 
-      <!-- S7 busy parent 29.2-37.3 -->
-      <section id="e1" class="scene clip ex" data-start="29.2" data-duration="8.1" data-track-index="1">
+      <!-- S7 busy parent 44-52.1 -->
+      <section id="e1" class="scene clip ex" data-start="44" data-duration="8.1" data-track-index="1">
         <div class="fill" style="background:var(--yellow)"></div>
         <div class="label">// 03 · for families</div>
-        <div class="head"><span class="w" data-t="29.40">Busy</span> <span class="w hl ink" data-t="29.65">parent?</span></div>
-        <div class="req card w" data-t="30.60"><div class="who"><i><svg viewBox="0 0 24 24" class="ic"><path d="M5 3h4l2 5-3 2a12 12 0 0 0 6 6l2-3 5 2v4a2 2 0 0 1-2 2A18 18 0 0 1 3 5a2 2 0 0 1 2-2z" /></svg></i>You, on a call with Opus</div><p>"Plan my daughter's 7th birthday party."</p></div>
+        <div class="head"><span class="w" data-t="44.2">Busy</span> <span class="w hl ink" data-t="44.45">parent?</span></div>
+        <div class="req card w" data-t="45.4"><div class="who"><i><svg viewBox="0 0 24 24" class="ic"><path d="M5 3h4l2 5-3 2a12 12 0 0 0 6 6l2-3 5 2v4a2 2 0 0 1-2 2A18 18 0 0 1 3 5a2 2 0 0 1 2-2z" /></svg></i>You, on a call with Opus</div><p>"Plan my daughter's 7th birthday party."</p></div>
         <img class="coin px" src="assets/objects/ring.png" alt="" />
-        <div class="result card w" data-t="33.20"><h4>Mia's party plan</h4><div class="sub">SATURDAY · 2:00 PM · 18 GUESTS</div>
-          <div class="tick w" data-t="33.40"><b>✓</b>Venue found</div><div class="tick w" data-t="34.50"><b>✓</b>Invites written</div><div class="tick w" data-t="35.90"><b>✓</b>Plan texted to you</div></div>
+        <div class="result card w" data-t="48"><h4>Mia's party plan</h4><div class="sub">SATURDAY · 2:00 PM · 18 GUESTS</div>
+          <div class="tick w" data-t="48.2"><b>✓</b>Venue found</div><div class="tick w" data-t="49.3"><b>✓</b>Invites written</div><div class="tick w" data-t="50.7"><b>✓</b>Plan texted to you</div></div>
       </section>
 
-      <!-- S8 small business 37.3-43.8 -->
-      <section id="e2" class="scene clip ex" data-start="37.3" data-duration="6.5" data-track-index="1">
+      <!-- S8 small business 52.1-58.6 -->
+      <section id="e2" class="scene clip ex" data-start="52.1" data-duration="6.5" data-track-index="1">
         <div class="fill" style="background:var(--orange)"></div>
         <div class="label">// 03 · for business</div>
-        <div class="head"><span class="w" data-t="37.50">Small</span> <span class="w hl ink" data-t="37.80">business?</span></div>
-        <div class="req card w" data-t="38.80"><div class="who"><i><svg viewBox="0 0 24 24" class="ic"><path d="M5 3h4l2 5-3 2a12 12 0 0 0 6 6l2-3 5 2v4a2 2 0 0 1-2 2A18 18 0 0 1 3 5a2 2 0 0 1 2-2z" /></svg></i>You, on a call with Opus</div><p>"Build me a booking website."</p></div>
+        <div class="head"><span class="w" data-t="52.3">Small</span> <span class="w hl ink" data-t="52.6">business?</span></div>
+        <div class="req card w" data-t="53.6"><div class="who"><i><svg viewBox="0 0 24 24" class="ic"><path d="M5 3h4l2 5-3 2a12 12 0 0 0 6 6l2-3 5 2v4a2 2 0 0 1-2 2A18 18 0 0 1 3 5a2 2 0 0 1 2-2z" /></svg></i>You, on a call with Opus</div><p>"Build me a booking website."</p></div>
         <img class="coin px" src="assets/objects/ring.png" alt="" />
-        <div class="result card browser w" data-t="41.40" style="padding:0"><div class="bar"><i></i><i></i><i></i>fadecitybarbers.com</div><div class="site"><h5>Fresh cuts. Book in seconds.</h5><div class="slots"><span>10:00</span><span class="on">11:30</span><span>1:00</span><span>3:30</span></div></div></div>
-        <div class="link w" data-t="42.50"><b>✓</b>Link texted to you</div>
+        <div class="result card browser w" data-t="56.2" style="padding:0"><div class="bar"><i></i><i></i><i></i>fadecitybarbers.com</div><div class="site"><h5>Fresh cuts. Book in seconds.</h5><div class="slots"><span>10:00</span><span class="on">11:30</span><span>1:00</span><span>3:30</span></div></div></div>
+        <div class="link w" data-t="57.3"><b>✓</b>Link texted to you</div>
       </section>
 
-      <!-- S9 student 43.8-48.5 -->
-      <section id="e3" class="scene clip ex" data-start="43.8" data-duration="4.7" data-track-index="1">
+      <!-- S9 student 58.6-63.3 -->
+      <section id="e3" class="scene clip ex" data-start="58.6" data-duration="4.7" data-track-index="1">
         <div class="fill" style="background:var(--pink)"></div>
         <div class="label">// 03 · for school</div>
-        <div class="head"><span class="w hl ink" data-t="44.00">Student?</span></div>
-        <div class="req card w" data-t="44.90"><div class="who"><i><svg viewBox="0 0 24 24" class="ic"><path d="M4 5h16v11H9l-5 4z" /></svg></i>You, texting Opus</div><p>Make me a study guide from my notes</p></div>
+        <div class="head"><span class="w hl ink" data-t="58.8">Student?</span></div>
+        <div class="req card w" data-t="59.7"><div class="who"><i><svg viewBox="0 0 24 24" class="ic"><path d="M4 5h16v11H9l-5 4z" /></svg></i>You, texting Opus</div><p>Make me a study guide from my notes</p></div>
         <img class="coin px" src="assets/objects/ring.png" alt="" />
-        <div class="result card w" data-t="47.10"><h4>Biology 101 · Study guide</h4><div class="sub">READY · 3 CHAPTERS · 24 FLASHCARDS</div><span class="line" style="width:92%"></span><span class="line" style="width:76%"></span><span class="line" style="width:84%"></span></div>
+        <div class="result card w" data-t="61.9"><h4>Biology 101 · Study guide</h4><div class="sub">READY · 3 CHAPTERS · 24 FLASHCARDS</div><span class="line" style="width:92%"></span><span class="line" style="width:76%"></span><span class="line" style="width:84%"></span></div>
       </section>
 
-      <!-- S10 every day 48.5-54.9 -->
-      <section id="s10" class="scene clip" data-start="48.5" data-duration="6.4" data-track-index="1">
+      <!-- S10 every day 63.3-69.7 -->
+      <section id="s10" class="scene clip" data-start="63.3" data-duration="6.4" data-track-index="1">
         <div class="fill"></div>
         <div class="label">// 04 · every day</div>
-        <div class="row card w" data-t="48.70" style="top:260px"><svg viewBox="0 0 64 64"><rect x="6" y="14" width="52" height="36" rx="5" /><path d="M8 16l24 19 24-19" /></svg><b>Reads and answers your email</b></div>
-        <div class="row card w" data-t="50.74" style="top:530px"><svg viewBox="0 0 64 64"><rect x="8" y="12" width="48" height="44" rx="6" /><path d="M8 24h48M20 6v12M44 6v12" /></svg><b>Runs your calendar</b></div>
-        <div class="row card w" data-t="51.97" style="top:800px"><svg viewBox="0 0 64 64"><circle cx="27" cy="27" r="17" /><path d="M40 40l16 16" /></svg><b>Researches anything</b></div>
-        <div class="row card w" data-t="53.26" style="top:1070px"><svg viewBox="0 0 64 64"><path d="M10 14h44a4 4 0 0 1 4 4v24a4 4 0 0 1-4 4H26l-12 10V46h-4a4 4 0 0 1-4-4V18a4 4 0 0 1 4-4z" /></svg><b>Texts people for you</b></div>
+        <div class="row card w" data-t="63.5" style="top:260px"><svg viewBox="0 0 64 64"><rect x="6" y="14" width="52" height="36" rx="5" /><path d="M8 16l24 19 24-19" /></svg><b>Reads and answers your email</b></div>
+        <div class="row card w" data-t="65.54" style="top:530px"><svg viewBox="0 0 64 64"><rect x="8" y="12" width="48" height="44" rx="6" /><path d="M8 24h48M20 6v12M44 6v12" /></svg><b>Runs your calendar</b></div>
+        <div class="row card w" data-t="66.77" style="top:800px"><svg viewBox="0 0 64 64"><circle cx="27" cy="27" r="17" /><path d="M40 40l16 16" /></svg><b>Researches anything</b></div>
+        <div class="row card w" data-t="68.06" style="top:1070px"><svg viewBox="0 0 64 64"><path d="M10 14h44a4 4 0 0 1 4 4v24a4 4 0 0 1-4 4H26l-12 10V46h-4a4 4 0 0 1-4-4V18a4 4 0 0 1 4-4z" /></svg><b>Texts people for you</b></div>
       </section>
 
-      <!-- S11 your okay 54.9-57.2 -->
-      <section id="s11" class="scene clip" data-start="54.9" data-duration="2.3" data-track-index="1">
+      <!-- S11 your okay 69.7-72 -->
+      <section id="s11" class="scene clip" data-start="69.7" data-duration="2.3" data-track-index="1">
         <div class="fill"></div>
         <div class="label" style="color:#fff">// always your call</div>
-        <div class="head" id="s11-head"><span class="w" data-t="55.10">Nothing happens without your</span> <span class="w hl" data-t="56.20">okay.</span></div>
-        <div id="s11-card" class="card w" data-t="55.25"><p>Should I send it?</p><div id="s11-btns"><div id="s11-yes">Yes</div><div>No</div></div></div>
+        <div class="head" id="s11-head"><span class="w" data-t="69.9">Nothing happens without your</span> <span class="w hl" data-t="71">okay.</span></div>
+        <div id="s11-card" class="card w" data-t="70.05"><p>Should I send it?</p><div id="s11-btns"><div id="s11-yes">Yes</div><div>No</div></div></div>
       </section>
 
-      <!-- S12 end card 57.2-65 -->
-      <section id="s12" class="scene clip" data-start="57.2" data-duration="7.8" data-track-index="1">
+      <!-- S12 end card 72-65 -->
+      <section id="s12" class="scene clip" data-start="72" data-duration="7.8" data-track-index="1">
         <div class="fill"></div>
         <img class="coin px" id="s12-c1" src="assets/objects/ring.png" style="left:110px;top:300px" alt="" />
         <img class="coin px" id="s12-c2" src="assets/objects/ring.png" style="left:870px;top:420px" alt="" />
         <img class="px" id="s12-m" src="assets/mascot/wave.png" alt="" />
         <div id="s12-word"><img class="px" src="assets/objects/ring.png" alt="" /><span>PUS</span></div>
         <div id="s12-acro"><b>O</b>MNI<b>P</b>OTENT <b>P</b>ERSONAL <b>U</b>TILITY <b>S</b>YSTEM</div>
-        <div id="s12-tag"><span class="w" data-t="58.30">One call</span> <span class="w hl" data-t="59.70">away.</span></div>
+        <div id="s12-tag"><span class="w" data-t="73.1">One call</span> <span class="w hl" data-t="74.5">away.</span></div>
         <div id="s12-btnrow"><div id="s12-btn">Book your setup</div></div>
         <div id="s12-url">GETOPUS.ONLINE</div>
         <div id="s12-small">call or text · no app · no login</div>
       </section>
 
-      <div id="cap" class="clip" data-start="0" data-duration="65" data-track-index="3"></div>
-      <div id="tc" class="clip" data-start="0" data-duration="65" data-track-index="4"></div>
-      <audio id="mix" src="assets/audio/mix.wav" data-start="0" data-duration="65" data-track-index="6" data-volume="1"></audio>
+      <div id="cap" class="clip" data-start="0" data-duration="80" data-track-index="3"></div>
+      <div id="tc" class="clip" data-start="0" data-duration="80" data-track-index="4"></div>
+      <audio id="mix" src="assets/audio/mix.wav" data-start="0" data-duration="80" data-track-index="6" data-volume="1"></audio>
     </div>
 
     <script>
@@ -268,14 +274,19 @@
         ["No app to download.", 7.87, 9.1], ["You just call it, or text it,", 9.33, 10.9], ["like a real assistant.", 11.19, 12.6],
         ["Here's how it works.", 13.0, 14.3],
         ["Step one: call or text Opus,", 14.8, 17.25], ["and just say what you need.", 17.46, 19.0],
-        ["Step two: Opus reads it back,", 19.4, 22.0], ["and asks for your okay.", 22.27, 24.0],
-        ["Step three: say yes.", 24.2, 26.3], ["Opus does it, and texts you when it's done.", 26.55, 29.1],
-        ["Busy parent? Call and say: plan my daughter's party.", 29.4, 33.0], ["Opus finds the venue, writes the invites,", 33.19, 35.65], ["and sends you the plan.", 35.76, 37.2],
-        ["Small business? Call and say: build me a booking website.", 37.5, 41.0], ["Opus builds it, and sends you the link.", 41.15, 43.6],
-        ["Student? Text: make me a study guide.", 44.0, 46.9], ["It's back in minutes.", 47.15, 48.4],
-        ["It reads and answers your email,", 48.7, 50.5], ["runs your calendar,", 50.74, 51.8], ["researches anything,", 51.97, 53.1], ["and texts people for you.", 53.26, 54.8],
-        ["Nothing happens without your okay.", 55.1, 57.1],
-        ["Opus. Your personal assistant, one call away.", 57.4, 60.7], ["Get yours at getopus.online", 60.95, 64.6]
+        ["Opus: Hi, this is Opus! What can I do for you?", 19.3, 22.2],
+        ["You: Order lunch for the team. 12 people, Thai, by 12:30.", 22.4, 27.4],
+        ["Step two: Opus reads it back,", 27.6, 30.2], ["and asks for your okay.", 30.47, 32.0],
+        ["Opus: Got it. Thai Garden, 12 lunches, arriving at 12:30. Should I order?", 32.2, 36.7],
+        ["Step three: say yes, and it's done.", 36.9, 39.0],
+        ["You: Yes, please.", 39.2, 40.25],
+        ["Opus: Done! I'll text you when it's on the way.", 40.4, 42.7],
+        ["Busy parent? Call and say: plan my daughter's party.", 44.2, 47.8], ["Opus finds the venue, writes the invites,", 47.99, 50.45], ["and sends you the plan.", 50.56, 52],
+        ["Small business? Call and say: build me a booking website.", 52.3, 55.8], ["Opus builds it, and sends you the link.", 55.95, 58.4],
+        ["Student? Text: make me a study guide.", 58.8, 61.7], ["It's back in minutes.", 61.95, 63.2],
+        ["It reads and answers your email,", 63.5, 65.3], ["runs your calendar,", 65.54, 66.6], ["researches anything,", 66.77, 67.9], ["and texts people for you.", 68.06, 69.6],
+        ["Nothing happens without your okay.", 69.9, 71.9],
+        ["Opus. Your personal assistant, one call away.", 72.2, 75.5], ["Get yours at getopus.online", 75.75, 79.4]
       ];
       const cap = document.getElementById("cap");
       CAPS.forEach(([txt], i) => {
@@ -285,7 +296,7 @@
         cap.appendChild(d);
       });
       const tc = document.getElementById("tc");
-      for (let s = 0; s < 65; s++) {
+      for (let s = 0; s < 80; s++) {
         const d = document.createElement("span");
         d.className = "d"; d.id = "tc" + s;
         d.textContent = "OPUS  00:00:" + String(s).padStart(2, "0") + ":00";
@@ -300,11 +311,11 @@
         tl.fromTo("#cap" + i, { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.15, ease: "power2.out" }, a);
         tl.to("#cap" + i, { opacity: 0, duration: 0.1 }, b);
       });
-      for (let s = 0; s < 65; s++) {
+      for (let s = 0; s < 80; s++) {
         tl.set("#tc" + s, { opacity: 1 }, s);
-        if (s < 64) tl.set("#tc" + s, { opacity: 0 }, s + 1);
+        if (s < 79) tl.set("#tc" + s, { opacity: 0 }, s + 1);
       }
-      [[0, "#121214"], [4, "#ffffff"], [12.8, "#121214"], [54.9, "#ffffff"], [57.2, "#121214"]].forEach(([t, c]) => tl.set("#tc", { color: c }, t));
+      [[0, "#121214"], [4, "#ffffff"], [12.8, "#121214"], [69.7, "#ffffff"], [72, "#121214"]].forEach(([t, c]) => tl.set("#tc", { color: c }, t));
 
       const spin = (sel, t, n) => tl.fromTo(sel, { scaleX: 1 }, { scaleX: -1, duration: 0.45, yoyo: true, repeat: n, ease: "sine.inOut" }, t);
 
@@ -317,37 +328,39 @@
       // S3
       tl.fromTo("#s3-m", { y: 700 }, { y: 0, duration: 0.5, ease: "back.out(1.4)" }, 12.85);
       // S4 steps: active step pill + headline swap
-      [["#tr1", "#sh1", 14.8, 19.2], ["#tr2", "#sh2", 19.4, 24.0], ["#tr3", "#sh3", 24.2, 29.2]].forEach(([tr, sh, a, b]) => {
+      [["#tr1", "#sh1", 14.8, 27.4], ["#tr2", "#sh2", 27.6, 36.8], ["#tr3", "#sh3", 36.9, 44.0]].forEach(([tr, sh, a, b]) => {
         tl.set(tr, { backgroundColor: "#121214", color: "#ffffff" }, a);
-        if (b < 29) tl.set(tr, { backgroundColor: "#ffffff", color: "#121214" }, b);
+        if (b < 43) tl.set(tr, { backgroundColor: "#ffffff", color: "#121214" }, b);
         tl.fromTo(sh, { opacity: 0, x: 60 }, { opacity: 1, x: 0, duration: 0.35, ease: "expo.out" }, a);
-        if (b < 29) tl.to(sh, { opacity: 0, x: -60, duration: 0.2 }, b - 0.1);
+        if (b < 43) tl.to(sh, { opacity: 0, x: -60, duration: 0.2 }, b - 0.1);
       });
       document.querySelectorAll("#callbar .wave u").forEach((b, i) => {
-        tl.fromTo(b, { scaleY: 0.25 }, { scaleY: 1, duration: 0.18 + (i % 3) * 0.05, yoyo: true, repeat: 41, ease: "sine.inOut" }, 15.9 + i * 0.04);
+        tl.fromTo(b, { scaleY: 0.25 }, { scaleY: 1, duration: 0.18 + (i % 3) * 0.05, yoyo: true, repeat: 69, ease: "sine.inOut" }, 19.0 + i * 0.04);
       });
+      tl.to("#msgs", { y: -170, duration: 0.4, ease: "power2.inOut" }, 40.2);
+      tl.to("#msgs", { y: -300, duration: 0.35, ease: "power2.inOut" }, 42.65);
       tl.fromTo("#st-phone", { y: 400, rotation: 3 }, { y: 0, rotation: 0, duration: 0.5, ease: "expo.out" }, 14.65);
       // examples: colour wipes + coins
       ["#e1", "#e2", "#e3"].forEach((id, i) => {
-        const c = [29.2, 37.3, 43.8][i];
+        const c = [44, 52.1, 58.6][i];
         tl.fromTo(id + " .fill", { clipPath: "inset(0 0 100% 0)" }, { clipPath: "inset(0 0 0% 0)", duration: 0.25, ease: "power3.out" }, c);
         spin(id + " .coin", c + 0.4, 6);
       });
-      tl.fromTo("#e3 .line", { scaleX: 0 }, { scaleX: 1, duration: 0.25, stagger: 0.08, ease: "power3.out" }, 47.3);
-      tl.fromTo("#e2 .slots span", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.2, stagger: 0.06 }, 41.7);
+      tl.fromTo("#e3 .line", { scaleX: 0 }, { scaleX: 1, duration: 0.25, stagger: 0.08, ease: "power3.out" }, 62.1);
+      tl.fromTo("#e2 .slots span", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.2, stagger: 0.06 }, 56.5);
       // S11: the Yes button gets pressed
-      tl.to("#s11-yes", { scale: 0.9, duration: 0.1, yoyo: true, repeat: 1, ease: "power2.out" }, 56.5);
+      tl.to("#s11-yes", { scale: 0.9, duration: 0.1, yoyo: true, repeat: 1, ease: "power2.out" }, 71.3);
       // S12
-      tl.fromTo("#s12-word img", { scale: 0, rotation: -180 }, { scale: 1, rotation: 0, duration: 0.6, ease: "back.out(1.8)" }, 57.3);
-      tl.fromTo("#s12-word span", { opacity: 0, x: -40 }, { opacity: 1, x: 0, duration: 0.45, ease: "expo.out" }, 57.45);
-      tl.fromTo("#s12-m", { y: 500, opacity: 0 }, { y: 0, opacity: 1, duration: 0.55, ease: "back.out(1.5)" }, 57.5);
-      tl.to("#s12-m", { y: -18, duration: 0.7, yoyo: true, repeat: 7, ease: "sine.inOut" }, 58.1);
-      tl.fromTo("#s12-acro", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 57.9);
-      tl.fromTo("#s12-btn", { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.45, ease: "back.out(2)" }, 59.8);
-      tl.to("#s12-btn", { scale: 1.05, duration: 0.6, yoyo: true, repeat: 3, ease: "sine.inOut" }, 60.4);
-      tl.fromTo("#s12-url", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.4, ease: "power3.out" }, 60.95);
-      tl.fromTo("#s12-small", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 61.4);
-      spin("#s12-c1", 57.6, 8); spin("#s12-c2", 57.8, 8);
+      tl.fromTo("#s12-word img", { scale: 0, rotation: -180 }, { scale: 1, rotation: 0, duration: 0.6, ease: "back.out(1.8)" }, 72.1);
+      tl.fromTo("#s12-word span", { opacity: 0, x: -40 }, { opacity: 1, x: 0, duration: 0.45, ease: "expo.out" }, 72.25);
+      tl.fromTo("#s12-m", { y: 500, opacity: 0 }, { y: 0, opacity: 1, duration: 0.55, ease: "back.out(1.5)" }, 72.3);
+      tl.to("#s12-m", { y: -18, duration: 0.7, yoyo: true, repeat: 7, ease: "sine.inOut" }, 72.9);
+      tl.fromTo("#s12-acro", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 72.7);
+      tl.fromTo("#s12-btn", { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.45, ease: "back.out(2)" }, 74.6);
+      tl.to("#s12-btn", { scale: 1.05, duration: 0.6, yoyo: true, repeat: 3, ease: "sine.inOut" }, 75.2);
+      tl.fromTo("#s12-url", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.4, ease: "power3.out" }, 75.75);
+      tl.fromTo("#s12-small", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 76.2);
+      spin("#s12-c1", 72.4, 8); spin("#s12-c2", 72.6, 8);
 
       window.__timelines["main"] = tl;
       tl.seek(0);
