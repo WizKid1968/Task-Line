@@ -24,7 +24,8 @@ new app. Written October 2026. Update this page whenever an app or rule changes.
    | Read / look up | "Summarize today's emails" | Starts right away |
    | Change or create | "Add a client to my list" | Read-back, then yes (+ code word on texts) |
    | Send, delete, publish | "Email Sam", "Delete that record" | Read-back, then yes (+ code word on texts) |
-   | Money | Payments, trades, purchases | **Never connected** |
+   | Paid credits | Videos, images (Higgsfield, HeyGen) | Read-back, then yes (+ code word on texts); credits used reported |
+| Money | Payments, trades, purchases | **Never connected** |
 
 2. **Fewest apps possible.** The worker only gets apps it needs for jobs you actually
    ask for. Add one at a time, after a real need.
@@ -65,9 +66,12 @@ Answer these, write the answers in the table below, then decide.
 | App | Used for | Outsiders can write to it? | Can change / delete / send? | Ask-first for | Status |
 |---|---|---|---|---|---|
 | Phone line (Telnyx) | Calls and texts | Yes (anyone can call/text) | Sends texts | Every text sent for you | Live |
-| Gmail | Read, summarize, send email | Yes (anyone can email you) | Send, reply, forward, delete | Sending, replying, deleting | Connected to account; attaching to worker |
-| GitHub (Task-Line code) | Code changes | Low (only you write there) | Push code, open pull requests | Any code change (never merges) | Attached to worker |
-| Airtable (Task-Line base) | System records | No | Server only | n/a | **Never given to the worker** |
+| Gmail | Read, summarize, send email | Yes (anyone can email you) | Send, reply, forward, delete | Sending, replying, deleting | Attached to worker |
+| Google Calendar | Read schedule, manage events | Yes (anyone can send an invite) | Create, move, delete events | Creating, moving, deleting | Attached to worker |
+| Higgsfield | Videos and images | Low | Spends paid credits | Any generation (no credit cap, by Rudy's choice; credits used are reported) | Attached to worker |
+| HyperFrames by HeyGen | Videos | Low | May spend paid credits | Any generation or render | Attached to worker |
+| GitHub (Task-Line code) | Code, web pages, apps | Low (only you write there) | Push code, open pull requests | Any code change (never merges) | Attached to worker |
+| Airtable (Task-Line base) | System records | No | Server only | n/a | **Worker told never to touch it.** Plan: limit the Airtable connection to other bases only |
 | Robinhood, Co-Invest | — | — | Trades (money) | — | **Not connected to the worker. Keep it that way.** |
 
 ## Open decisions
