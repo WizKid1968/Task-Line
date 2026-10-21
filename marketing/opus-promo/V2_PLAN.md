@@ -62,8 +62,8 @@ Not yet proven: making videos/images, building web pages/apps, ordering anything
   (`Authorization: Bearer`). Verified free: the balance didn't change after a line.
   Samples made: `review/fish-voices/` (not committed). Avoid voices cloned from real people
   or famous characters (commercial use).
-- **Higgsfield (pay-per-use API):** Rudy's key is valid (tested on his Mac). It needs a
-  **new session** to take effect (secrets are applied when a session starts). Use
+- **Higgsfield (pay-per-use API):** working in the builder environment (verified Oct 21,
+  16:43 UTC, after Rudy corrected the network secret; prefix `Key`, value `id:secret`). Use
   `tools/higgsfield/hf_cli.py` per `.claude/skills/higgsfield-api/SKILL.md`. Free key check:
   `POST https://api.higgsfield.ai/files/generate-upload-url` with `{"content_type":"image/png"}`
   must return `upload_url`, not 401.
