@@ -40,7 +40,7 @@ export async function handleStartLookup(req: Request, deps: Deps): Promise<Respo
       }),
       1500,
     );
-    return json(200, { ok: true, message: "Claude is looking into it. The result will come by text." });
+    return json(200, { ok: true, message: "Opus is on it. The answer will come by text." });
   } catch (err) {
     if (err instanceof JobError) return json(400, { ok: false, error: "job_not_started", message: err.message });
     throw err;
@@ -87,7 +87,7 @@ export async function handleJobReport(req: Request, deps: Deps): Promise<Respons
     return json(409, { error: "already_reported", status: job.status });
   }
 
-  const head = status === "done" ? "Task-Line: job done." : "Task-Line: job didn't work.";
+  const head = status === "done" ? "Opus: done." : "Opus: that didn't work.";
   const tail = link ? `\n${link}` : "";
   const room = MAX_RESULT_TEXT - head.length - tail.length - 1;
   const text = `${head}\n${summary.length > room ? `${summary.slice(0, room - 1)}…` : summary}${tail}`;

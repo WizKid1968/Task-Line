@@ -177,3 +177,13 @@ None right now.
   its token in Vercel, its own environment with the report secret, Gmail connected.
 - **Needed for email:** connect Gmail at claude.ai/customize/connectors (installed,
   not connected yet).
+- **Name (Oct 21):** the assistant is called **Opus**. "Opus is on it"; result texts start with "Opus:".
+- **Next: Jev safety checks (decided Oct 21: all of them).** Jev (TypeSafe AI) answers fixed yes/no
+  or choice questions with a confidence level; used as a second, independent judge, never the only
+  lock, and the safe path wins when it's unsure or down. Checkpoints: (1) before a look-up starts,
+  "does this send/change/delete/spend?"; (2) before a change job, money/deleting/mass email;
+  (3) before a result is texted, secrets or unrequested actions; (4) replies from people you texted,
+  scam or orders to the assistant; (5) daily watchdog of the phone agent's conversations;
+  (6) inside the worker, screening emails by sender/subject before opening. Waiting on: access to
+  docs.typesafe.ai and api.typesafe.ai from the builder environment, and the Jev key in Vercel.
+

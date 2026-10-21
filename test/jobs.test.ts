@@ -133,7 +133,7 @@ describe("results from the routine", () => {
     const { deps, net, jobId } = await runningJob();
     const res = await handleJobReport(report({ job_id: jobId, status: "done", summary: "Sunny, 70F.", link: "https://example.com/w" }), deps);
     expect(res.status).toBe(200);
-    expect(net.texts.at(-1)).toEqual({ to: TRUSTED_PHONE, text: "Task-Line: job done.\nSunny, 70F.\nhttps://example.com/w" });
+    expect(net.texts.at(-1)).toEqual({ to: TRUSTED_PHONE, text: "Opus: done.\nSunny, 70F.\nhttps://example.com/w" });
     expect(deps.store.jobs[0]!.status).toBe("done");
     const again = await handleJobReport(report({ job_id: jobId, status: "done", summary: "again" }), deps);
     expect(again.status).toBe(409);
@@ -153,7 +153,7 @@ describe("results from the routine", () => {
     const { deps, net, jobId } = await runningJob();
     await handleJobReport(report({ job_id: jobId, status: "failed", summary: "y".repeat(2000), link: "javascript:alert(1)" }), deps);
     const sent = net.texts.at(-1)!.text;
-    expect(sent.startsWith("Task-Line: job didn't work.\n")).toBe(true);
+    expect(sent.startsWith("Opus: that didn't work.\n")).toBe(true);
     expect(sent.length).toBeLessThanOrEqual(900);
     expect(sent).not.toContain("javascript");
   });

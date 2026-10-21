@@ -140,7 +140,7 @@ function jobTask(details: Record<string, unknown>): string {
 const claudeJobAction: ActionDefinition = {
   type: "claude_job",
   description:
-    'Hand a job that changes things (send an email, change code, open a pull request) to Claude. details: {"task": "the full job in the caller\'s words"}.',
+    'Hand a job that changes things (send an email, change code, open a pull request) to the worker. details: {"task": "the full job in the caller\'s words"}.',
   validate: (details) => {
     const task = jobTask(details);
     if (!task) return "I need to know what the job is.";
@@ -148,7 +148,7 @@ const claudeJobAction: ActionDefinition = {
     return null;
   },
   readBack: (details) =>
-    `I'll have Claude do this job, and it may make changes: "${jobTask(details)}". I'll text you the result when it's done.`,
+    `I'll do this job, and it may make changes: "${jobTask(details)}". I'll text you the result when it's done.`,
   run: async (details, ctx) => {
     const person = findPerson(ctx.config, ctx.caller.phone);
     if (!person) throw new Error("Caller is not approved.");
@@ -170,7 +170,7 @@ const claudeJobAction: ActionDefinition = {
       details: `${job.jobId} (approved changes): ${job.task}`,
       conversation: ctx.caller.conversation,
     });
-    return "Claude is working on it. You'll get a text with the result.";
+    return "Opus is on it. You'll get a text with the result.";
   },
 };
 

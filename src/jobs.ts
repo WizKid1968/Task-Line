@@ -78,7 +78,7 @@ export async function startJob(input: StartJobInput): Promise<Job> {
     });
   } catch (err) {
     await store.updateJob(job, { status: "failed", result: "Could not reach the routine." });
-    throw new JobError("I couldn't reach Claude to start the job.");
+    throw new JobError("I couldn't reach the worker to start the job.");
   }
   const body = (await res.json().catch(() => ({}))) as {
     claude_code_session_url?: string;
@@ -88,7 +88,7 @@ export async function startJob(input: StartJobInput): Promise<Job> {
     const reason = `${res.status} ${body.error?.type ?? ""}`.trim();
     logEvent("job_fire_failed", { jobId: job.jobId, reason });
     await store.updateJob(job, { status: "failed", result: `Routine refused to start (${reason}).` });
-    throw new JobError(res.status === 429 ? "Claude is busy (too many jobs this hour). Try again later." : "Claude didn't accept the job.");
+    throw new JobError(res.status === 429 ? "The worker is busy (too many jobs this hour). Try again later." : "The worker didn't accept the job.");
   }
 
   job = await store.updateJob(job, { status: "running", sessionUrl: body.claude_code_session_url ?? "" });
