@@ -186,4 +186,7 @@ None right now.
   scam or orders to the assistant; (5) daily watchdog of the phone agent's conversations;
   (6) inside the worker, screening emails by sender/subject before opening. **Built Oct 21**, all six,
   with 86 tests passing; see docs/SETUP.md section 6.
+- **Contacts (Oct 21):** text people by name ("Text Victor I'm on my way"). The two approved people
+  are built in from the server settings; others are saved with ask-first ("Save Sam's number…").
+  "What's Sam's number?" answers right away. Stored in the Task-Line base (server only).
 

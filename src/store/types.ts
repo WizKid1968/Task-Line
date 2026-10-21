@@ -61,6 +61,15 @@ export interface Job {
   recordId?: string;
 }
 
+/** Someone Rudy or the trusted person can text by name. */
+export interface Contact {
+  name: string;
+  phone: string; // E.164
+  addedBy: string; // who saved it (name)
+  createdAt: string;
+  recordId?: string;
+}
+
 export interface Store {
   createPending(p: PendingAction): Promise<PendingAction>;
   /** Find a pending action by its code, only among those requested by `phone`. */
@@ -76,4 +85,7 @@ export interface Store {
   updateJob(j: Job, changes: Partial<Job>): Promise<Job>;
   /** Jobs requested by `phone` created at or after `sinceIso`. */
   countJobsSince(phone: string, sinceIso: string): Promise<number>;
+  listContacts(): Promise<Contact[]>;
+  /** Add a contact, or replace the number of one with the same name (ignoring case). */
+  saveContact(c: Contact): Promise<Contact>;
 }

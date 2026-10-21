@@ -83,8 +83,8 @@ const assistant = {
       "Step 1 of the ask-first rule. Prepares a permanent action WITHOUT doing it. Returns a read_back sentence to read to the caller and a pending_code.",
       "/api/tools/request-action",
       {
-        action_type: { type: "string", description: "The kind of action: send_text, claude_job or test_action." },
-        details: { type: "object", description: "Details for the action. For send_text: {\"to\": \"phone number\", \"message\": \"exact text\"}. For claude_job: {\"task\": \"the full job\"}." },
+        action_type: { type: "string", description: "The kind of action: send_text, save_contact, claude_job or test_action." },
+        details: { type: "object", description: "Details for the action. For send_text: {\"to\": \"contact name or phone number\", \"message\": \"exact text\"}. For save_contact: {\"name\": \"Sam\", \"phone\": \"917-555-0101\"}. For claude_job: {\"task\": \"the full job\"}." },
       },
       ["action_type"],
     ),
@@ -104,6 +104,13 @@ const assistant = {
       "/api/tools/cancel-action",
       { pending_code: { type: "string", description: "The pending_code from request_action." } },
       ["pending_code"],
+    ),
+    webhookTool(
+      "find_contact",
+      "Look up a saved contact's phone number by name (Rudy, the trusted person, or anyone saved with save_contact). No approval needed.",
+      "/api/tools/find-contact",
+      { name: { type: "string", description: "The contact's name as the caller said it." } },
+      ["name"],
     ),
     webhookTool(
       "start_lookup",

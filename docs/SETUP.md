@@ -38,6 +38,8 @@ Tables (Claude creates these):
   Channel, Needs Code Word, Created, Expires, Code Word Failures, Result
 - **Outreach** — Recipient, Requested By, Requester Name, Message, Sent, Expires,
   Forwards (texts sent for someone, so replies within 24 hours can be passed back)
+- **Contacts** — Name, Phone, Added By, Created (people you can text by name; the two
+  approved people come from the server settings and aren't stored here)
 - **Jobs** — Job ID, Status, Permission, Task, Requested By, Requester Name, Channel,
   Session URL, Result, Created, Finished (bigger jobs handed to the routine)
 

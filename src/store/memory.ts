@@ -1,4 +1,4 @@
-import type { ActivityEntry, Job, Outreach, PendingAction, Store } from "./types.js";
+import type { ActivityEntry, Contact, Job, Outreach, PendingAction, Store } from "./types.js";
 
 /** In-memory store for tests. Data disappears when the process ends. */
 export class MemoryStore implements Store {
@@ -6,6 +6,7 @@ export class MemoryStore implements Store {
   logs: ActivityEntry[] = [];
   outreach: Outreach[] = [];
   jobs: Job[] = [];
+  contacts: Contact[] = [];
 
   async createPending(p: PendingAction): Promise<PendingAction> {
     const saved = { ...p, recordId: `mem${this.pending.length + 1}` };
@@ -74,5 +75,17 @@ export class MemoryStore implements Store {
   async countJobsSince(phone: string, sinceIso: string): Promise<number> {
     const since = Date.parse(sinceIso);
     return this.jobs.filter((j) => j.requestedBy === phone && Date.parse(j.createdAt) >= since).length;
+  }
+
+  async listContacts(): Promise<Contact[]> {
+    return this.contacts.map((c) => ({ ...c }));
+  }
+
+  async saveContact(c: Contact): Promise<Contact> {
+    const i = this.contacts.findIndex((x) => x.name.toLowerCase() === c.name.toLowerCase());
+    const saved = { ...c, recordId: i >= 0 ? this.contacts[i]!.recordId : `con${this.contacts.length + 1}` };
+    if (i >= 0) this.contacts[i] = saved;
+    else this.contacts.push(saved);
+    return { ...saved };
   }
 }

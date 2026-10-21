@@ -1,6 +1,7 @@
 import { type Config, findPerson } from "../config.js";
 import { MAX_TASK_CHARS, startJob } from "../jobs.js";
 import { checkJob } from "../jevChecks.js";
+import { prettyPhone, resolveRecipient } from "../contacts.js";
 import { normalizeUsPhone } from "../phone.js";
 import type { SessionClaims } from "../session.js";
 import type { Store } from "../store/types.js";
@@ -25,6 +26,11 @@ export interface ActionDefinition {
   type: string;
   /** Shown to the AI so it knows when to use this action. */
   description: string;
+  /**
+   * Optional: fill in details before validating, e.g. turn a contact's name into
+   * a number. Returns the updated details, or an error message for the agent.
+   */
+  prepare?(details: Record<string, unknown>, ctx: { store: Store; config: Config }): Promise<{ details: Record<string, unknown> } | { error: string }>;
   /** Returns an error message, or null if the details are OK. */
   validate(details: Record<string, unknown>, info: RequestInfo): string | null;
   /** Plain-English sentence the agent reads back before asking for a yes. */
@@ -79,14 +85,15 @@ function textDetails(details: Record<string, unknown>): { to: string | null; mes
   return { to, message };
 }
 
-/** "+15555550143" -> "555-555-0143" so it reads back clearly. */
-function prettyPhone(e164: string): string {
-  const d = e164.slice(2);
-  return `${d.slice(0, 3)}-${d.slice(3, 6)}-${d.slice(6)}`;
-}
 
 /** Text someone on the caller's behalf, from the agent's number. */
 const sendTextAction: ActionDefinition = {
+  prepare: async (details, ctx) => {
+    const raw = typeof details["to"] === "string" ? details["to"] : String(details["to"] ?? "");
+    const r = await resolveRecipient(raw, ctx.store, ctx.config);
+    if (!r.ok) return { error: r.message };
+    return { details: { ...details, to: r.phone, ...(r.name ? { to_name: r.name } : {}) } };
+  },
   type: "send_text",
   description:
     'Send a text message to a US phone number on the caller\'s behalf. details: {"to": "phone number", "message": "exact text"}.',
@@ -100,7 +107,8 @@ const sendTextAction: ActionDefinition = {
   },
   readBack: (details, info) => {
     const { to, message } = textDetails(details);
-    return `I'll text ${prettyPhone(to!)} this message: "${message}${signOff(info.callerName)}"`;
+    const who = typeof details["to_name"] === "string" ? `${details["to_name"]} (${prettyPhone(to!)})` : prettyPhone(to!);
+    return `I'll text ${who} this message: "${message}${signOff(info.callerName)}"`;
   },
   run: async (details, ctx) => {
     const { to, message } = textDetails(details);
@@ -181,7 +189,46 @@ const claudeJobAction: ActionDefinition = {
   },
 };
 
-const ACTIONS: ActionDefinition[] = [testAction, sendTextAction, claudeJobAction];
+function contactDetails(details: Record<string, unknown>): { name: string; phone: string | null } {
+  const name = typeof details["name"] === "string" ? details["name"].trim().replace(/\s+/g, " ") : "";
+  const phone = normalizeUsPhone(typeof details["phone"] === "string" ? details["phone"] : String(details["phone"] ?? ""));
+  return { name, phone };
+}
+
+/** Save (or update) a contact so the caller can text them by name. */
+const saveContactAction: ActionDefinition = {
+  type: "save_contact",
+  description: 'Save a contact so texts can be sent by name. details: {"name": "Sam Rivera", "phone": "917-555-0101"}.',
+  validate: (details) => {
+    const { name, phone } = contactDetails(details);
+    if (!name || name.length > 60 || !/[a-z]/i.test(name)) return "I need the contact's name.";
+    if (!phone) return "I need a valid US phone number for the contact.";
+    return null;
+  },
+  readBack: (details) => {
+    const { name, phone } = contactDetails(details);
+    return `I'll save ${name} as ${prettyPhone(phone!)} in your contacts.`;
+  },
+  run: async (details, ctx) => {
+    const { name, phone } = contactDetails(details);
+    if (ctx.config.people.some((p) => p.name.toLowerCase() === name.toLowerCase())) {
+      throw new Error(`${name} is one of the two approved people; that number can only be changed in the server settings.`);
+    }
+    const now = ctx.now();
+    await ctx.store.saveContact({ name, phone: phone!, addedBy: ctx.callerName, createdAt: now.toISOString() });
+    await ctx.store.log({
+      who: ctx.callerName,
+      phone: ctx.caller.phone,
+      channel: ctx.caller.channel,
+      event: "contact_saved",
+      details: `${name}: ${phone}`,
+      conversation: ctx.caller.conversation,
+    });
+    return `Saved ${name} (${prettyPhone(phone!)}) to your contacts.`;
+  },
+};
+
+const ACTIONS: ActionDefinition[] = [testAction, sendTextAction, claudeJobAction, saveContactAction];
 
 export function getAction(type: string): ActionDefinition | null {
   return ACTIONS.find((a) => a.type === type) ?? null;

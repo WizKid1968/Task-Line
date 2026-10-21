@@ -35,7 +35,15 @@ export async function handleRequestAction(req: Request, deps: Deps): Promise<Res
     });
   }
 
-  const details = asObject(body["details"]);
+  let details = asObject(body["details"]);
+  if (def.prepare) {
+    const prepared = await def.prepare(details, { store: deps.store, config: deps.config });
+    if ("error" in prepared) {
+      logEvent("request_rejected", { reason: "prepare", type, problem: prepared.error });
+      return json(400, { error: "invalid_details", message: prepared.error });
+    }
+    details = prepared.details;
+  }
   const problem = def.validate(details, { callerName: person.name });
   if (problem) {
     logEvent("request_rejected", { reason: "invalid_details", type, problem });

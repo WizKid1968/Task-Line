@@ -1,12 +1,24 @@
 import type { AirtableConfig, Role } from "../config.js";
-import type { ActivityEntry, Job, JobPermission, JobStatus, Outreach, PendingAction, PendingStatus, Store } from "./types.js";
+import type { ActivityEntry, Contact, Job, JobPermission, JobStatus, Outreach, PendingAction, PendingStatus, Store } from "./types.js";
 
 export const TABLES = {
   activity: "Activity Log",
   pending: "Pending Actions",
   outreach: "Outreach",
   jobs: "Jobs",
+  contacts: "Contacts",
 } as const;
+
+function contactFromRecord(r: AirtableRecord): Contact {
+  const f = r.fields;
+  return {
+    recordId: r.id,
+    name: String(f["Name"] ?? ""),
+    phone: String(f["Phone"] ?? ""),
+    addedBy: String(f["Added By"] ?? ""),
+    createdAt: String(f["Created"] ?? ""),
+  };
+}
 
 function jobFields(j: Partial<Job>): Fields {
   const f: Fields = {};
@@ -268,5 +280,34 @@ export class AirtableStore implements Store {
     const out = await this.request<{ records: AirtableRecord[] }>("GET", this.url(TABLES.jobs, `?${params.toString()}`));
     const since = Date.parse(sinceIso);
     return out.records.map(jobFromRecord).filter((j) => Date.parse(j.createdAt) >= since).length;
+  }
+
+  async listContacts(): Promise<Contact[]> {
+    const out: Contact[] = [];
+    let offset: string | undefined;
+    do {
+      const params = new URLSearchParams({ pageSize: "100" });
+      if (offset) params.set("offset", offset);
+      const page = await this.request<{ records: AirtableRecord[]; offset?: string }>(
+        "GET",
+        this.url(TABLES.contacts, `?${params.toString()}`),
+      );
+      out.push(...page.records.map(contactFromRecord));
+      offset = page.offset;
+    } while (offset && out.length < 2000);
+    return out;
+  }
+
+  async saveContact(c: Contact): Promise<Contact> {
+    const existing = (await this.listContacts()).find((x) => x.name.toLowerCase() === c.name.toLowerCase());
+    const fields = { Name: c.name, Phone: c.phone, "Added By": c.addedBy, Created: c.createdAt };
+    if (existing?.recordId) {
+      const out = await this.request<AirtableRecord>("PATCH", this.url(TABLES.contacts, `/${existing.recordId}`), { fields, typecast: true });
+      return contactFromRecord(out);
+    }
+    const out = await this.request<{ records: AirtableRecord[] }>("POST", this.url(TABLES.contacts), { records: [{ fields }], typecast: true });
+    const rec = out.records[0];
+    if (!rec) throw new Error("Airtable returned no record");
+    return contactFromRecord(rec);
   }
 }
