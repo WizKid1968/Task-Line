@@ -122,6 +122,12 @@ const sendTextAction: ActionDefinition = {
       details: `To ${to}: "${text}" (Telnyx id ${sent.id})`,
       conversation: ctx.caller.conversation,
     });
+    // An approved person (owner or trusted) who replies is talking to Opus
+    // directly, not being passed along, so don't promise that.
+    const approvedRecipient = findPerson(ctx.config, to!);
+    if (approvedRecipient) {
+      return `Text sent to ${approvedRecipient.name} (${prettyPhone(to!)}). ${approvedRecipient.name} can use Opus too, so a reply from ${approvedRecipient.name} goes to Opus as their own conversation and is not passed to ${ctx.callerName}.`;
+    }
     // Remember the recipient so their replies can be passed back. The text is
     // already sent, so a failure here is logged but doesn't fail the action.
     const now = ctx.now();
@@ -223,7 +229,8 @@ const saveContactAction: ActionDefinition = {
       throw new Error(`${name} is one of the two approved people; that number can only be changed in the server settings.`);
     }
     const now = ctx.now();
-    await ctx.store.saveContact({ name, phone: phone!, addedBy: ctx.callerName, createdAt: now.toISOString() });
+    // Stored in the easy-to-read 917-555-0101 form; any US format is read back correctly.
+    await ctx.store.saveContact({ name, phone: prettyPhone(phone!), addedBy: ctx.callerName, createdAt: now.toISOString() });
     await ctx.store.log({
       who: ctx.callerName,
       phone: ctx.caller.phone,

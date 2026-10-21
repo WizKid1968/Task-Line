@@ -33,7 +33,7 @@ describe("contacts", () => {
     expect(save.read_back).toBe("I'll save Sam Rivera as 555-555-0177 in your contacts.");
     expect(deps.store.contacts).toHaveLength(0); // nothing saved before yes + code word
     await handleConfirmAction(signedRequest(CONFIRM, { pending_code: save.pending_code, code_word: "Blue Falcon", ...presets(OWNER_PHONE) }), deps);
-    expect(deps.store.contacts[0]).toMatchObject({ name: "Sam Rivera", phone: "+15555550177", addedBy: "Owner" });
+    expect(deps.store.contacts[0]).toMatchObject({ name: "Sam Rivera", phone: "555-555-0177", addedBy: "Owner" });
 
     const req = (await (await handleRequestAction(text("sam"), deps)).json()) as any;
     expect(req.read_back).toContain("Sam Rivera (555-555-0177)");
@@ -98,5 +98,23 @@ describe("contacts with the same name", () => {
     expect(req.read_back).toContain("Victor (555-555-0170)");
     const req2 = (await (await handleRequestAction(text("Victor Diaz"), deps)).json()) as any;
     expect(req2.read_back).toContain("Victor Diaz (555-555-0172)");
+  });
+});
+
+describe("texting the other approved person", () => {
+  it("doesn't promise to pass their reply along, and doesn't record it as outreach", async () => {
+    const { deps } = setup();
+    const req = (await (await handleRequestAction(text("friend"), deps)).json()) as any;
+    const ok = (await (await handleConfirmAction(signedRequest(CONFIRM, { pending_code: req.pending_code, code_word: "Blue Falcon", ...presets(OWNER_PHONE) }), deps)).json()) as any;
+    expect(ok.result).toContain("goes to Opus as their own conversation");
+    expect(deps.store.outreach).toHaveLength(0);
+  });
+
+  it("contacts saved in any format are found", async () => {
+    const { deps } = setup();
+    await deps.store.saveContact({ name: "Ana", phone: "+15555550180", addedBy: "Owner", createdAt: "" });
+    await deps.store.saveContact({ name: "Ben", phone: "(555) 555-0181", addedBy: "Owner", createdAt: "" });
+    expect(((await (await handleRequestAction(text("Ana"), deps)).json()) as any).read_back).toContain("555-555-0180");
+    expect(((await (await handleRequestAction(text("Ben"), deps)).json()) as any).read_back).toContain("555-555-0181");
   });
 });
