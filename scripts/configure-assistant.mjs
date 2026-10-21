@@ -107,7 +107,7 @@ const assistant = {
     ),
     webhookTool(
       "start_lookup",
-      "Hand a look-up to Claude: research, reading or summarizing email, checking code. Only when nothing will be changed or sent. No approval needed. The answer is texted to the caller.",
+      "ALWAYS use this when the caller asks about their email, calendar, schedule, documents, or anything to look up or research. Claude (the worker) has access to these; you do not. Only for requests that change or send nothing. No approval needed. The answer is texted to the caller.",
       "/api/tools/start-lookup",
       { task: { type: "string", description: "The request in the caller's words, with every detail they gave." } },
       ["task"],
