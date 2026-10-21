@@ -33,7 +33,7 @@ describe("contacts", () => {
     expect(save.read_back).toBe("I'll save Sam Rivera as 555-555-0177 in your contacts.");
     expect(deps.store.contacts).toHaveLength(0); // nothing saved before yes + code word
     await handleConfirmAction(signedRequest(CONFIRM, { pending_code: save.pending_code, code_word: "Blue Falcon", ...presets(OWNER_PHONE) }), deps);
-    expect(deps.store.contacts[0]).toMatchObject({ name: "Sam Rivera", phone: "+15555550177", addedBy: "Owner" });
+    expect(deps.store.contacts[0]).toMatchObject({ name: "Sam Rivera", phone: "555-555-0177", addedBy: "Owner" });
 
     const req = (await (await handleRequestAction(text("sam"), deps)).json()) as any;
     expect(req.read_back).toContain("Sam Rivera (555-555-0177)");

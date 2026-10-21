@@ -229,7 +229,8 @@ const saveContactAction: ActionDefinition = {
       throw new Error(`${name} is one of the two approved people; that number can only be changed in the server settings.`);
     }
     const now = ctx.now();
-    await ctx.store.saveContact({ name, phone: phone!, addedBy: ctx.callerName, createdAt: now.toISOString() });
+    // Stored in the easy-to-read 917-555-0101 form; any US format is read back correctly.
+    await ctx.store.saveContact({ name, phone: prettyPhone(phone!), addedBy: ctx.callerName, createdAt: now.toISOString() });
     await ctx.store.log({
       who: ctx.callerName,
       phone: ctx.caller.phone,
