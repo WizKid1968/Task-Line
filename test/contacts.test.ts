@@ -52,6 +52,20 @@ describe("contacts", () => {
     expect(deps.store.pending).toHaveLength(0);
   });
 
+  it("names misheard on a call still find the saved contact", async () => {
+    const { deps } = setup();
+    await deps.store.saveContact({ name: "Orlandus Gilmore", phone: "+15555550181", addedBy: "Owner", createdAt: "" });
+    await deps.store.saveContact({ name: "Damon Hayes", phone: "+15555550182", addedBy: "Owner", createdAt: "" });
+    const misheard = (await (await handleRequestAction(text("Orlando Gilmore"), deps)).json()) as any;
+    expect(misheard.read_back).toContain("Orlandus Gilmore (555-555-0181)");
+    const firstOnly = (await (await handleRequestAction(text("Orlando"), deps)).json()) as any;
+    expect(firstOnly.read_back).toContain("Orlandus Gilmore");
+    const spelling = (await (await handleRequestAction(text("Damen Hays"), deps)).json()) as any;
+    expect(spelling.read_back).toContain("Damon Hayes (555-555-0182)");
+    const none = (await (await handleRequestAction(text("Sharon"), deps)).json()) as any;
+    expect(none.message).toContain('no saved contact named "Sharon"');
+  });
+
   it("the approved people's numbers can't be changed by saving a contact", async () => {
     const { deps } = setup();
     const save = (await (await handleRequestAction(

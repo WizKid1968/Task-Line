@@ -27,9 +27,9 @@ export async function allContacts(store: Store, config: Config): Promise<Contact
 }
 
 /**
- * Find contacts by name. An exact full-name match wins; otherwise any contact
- * whose first name (or any single word of the name) matches. Can return
- * several, so the caller can ask which one.
+ * Find contacts by name. An exact full-name match wins; then contacts that have
+ * every spoken word; then close spellings. Can return several, so the caller
+ * can ask which one.
  */
 export async function findContacts(name: string, store: Store, config: Config): Promise<ContactMatch[]> {
   const q = clean(name);
@@ -38,10 +38,42 @@ export async function findContacts(name: string, store: Store, config: Config): 
   const exact = all.filter((c) => clean(c.name) === q);
   if (exact.length) return exact;
   const words = q.split(" ");
-  return all.filter((c) => {
+  const wordMatch = all.filter((c) => {
     const parts = clean(c.name).split(" ");
     return words.every((w) => parts.includes(w));
   });
+  if (wordMatch.length) return wordMatch;
+  // Close spellings: on calls, speech-to-text often hears a name slightly wrong
+  // ("Orlando" for "Orlandus"). The read-back shows the saved name and number,
+  // and nothing is sent without the caller's yes, so a close match is safe.
+  return all.filter((c) => {
+    const parts = clean(c.name).split(" ");
+    return words.every((w) => parts.some((part) => similar(w, part)));
+  });
+}
+
+/** Two name words sound alike: same word, a small spelling difference, or a long shared start. */
+function similar(a: string, b: string): boolean {
+  if (a === b) return true;
+  const shorter = Math.min(a.length, b.length);
+  if (shorter < 3) return false;
+  if (shorter >= 5 && a.slice(0, 5) === b.slice(0, 5)) return true;
+  const allowed = shorter >= 7 ? 2 : 1;
+  return editDistance(a, b) <= allowed;
+}
+
+function editDistance(a: string, b: string): number {
+  const prev = Array.from({ length: b.length + 1 }, (_, j) => j);
+  for (let i = 1; i <= a.length; i++) {
+    let diag = prev[0]!;
+    prev[0] = i;
+    for (let j = 1; j <= b.length; j++) {
+      const up = prev[j]!;
+      prev[j] = Math.min(prev[j]! + 1, prev[j - 1]! + 1, diag + (a[i - 1] === b[j - 1] ? 0 : 1));
+      diag = up;
+    }
+  }
+  return prev[b.length]!;
 }
 
 /** "+19172803031" -> "917-280-3031". */

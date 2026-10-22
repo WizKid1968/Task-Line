@@ -80,7 +80,10 @@ const assistant = {
   dynamic_variables_webhook_url: `${serverUrl}/api/telnyx/init`,
   dynamic_variables_webhook_timeout_ms: 5000,
   // Safe defaults if the server can't be reached: treat the caller as unknown.
-  dynamic_variables: { caller_role: "unknown", caller_name: "", code_word_required: "yes", role_instructions: strangerInstructions },
+  dynamic_variables: { caller_role: "unknown", caller_name: "", code_word_required: "yes", role_instructions: strangerInstructions, greeting: "Sorry, this is a private line and it can't take messages." },
+  // What the agent says first on a call. The server picks it per caller (members hear their name,
+  // everyone else hears only the private-line sentence).
+  greeting: "{{greeting}}",
   tools: [
     webhookTool(
       "request_action",

@@ -1,3 +1,4 @@
+import { STRANGER_REPLY } from "../src/agentInstructions.js";
 import { describe, expect, it } from "vitest";
 import { decryptFromTelnyx } from "../src/encrypt.js";
 import { handleCancelAction, handleConfirmAction, handleRequestAction } from "../src/handlers/actions.js";
@@ -35,7 +36,7 @@ describe("start of conversation", () => {
     expect(res.status).toBe(200);
     const out = (await res.json()) as any;
     expect(out.dynamic_variables).toMatchObject({ caller_role: "owner", caller_name: "Owner", code_word_required: "no" });
-    expect(Object.keys(out.dynamic_variables).sort()).toEqual(["caller_name", "caller_role", "code_word_required", "role_instructions"]);
+    expect(Object.keys(out.dynamic_variables).sort()).toEqual(["caller_name", "caller_role", "code_word_required", "greeting", "role_instructions"]);
     const token = decryptFromTelnyx(out.encrypted_dynamic_variables.session_token, deps.config.telnyxEncryptionKey);
     const claims = verifySessionToken(token, deps.config.sessionSecret, NOW_SECONDS);
     expect(claims).toMatchObject({ role: "owner", phone: OWNER_PHONE, channel: "phone_call", verified: true });
@@ -56,6 +57,15 @@ describe("start of conversation", () => {
     expect(out.dynamic_variables.caller_role).toBe("unknown");
     expect(out.encrypted_dynamic_variables).toEqual({});
     expect(deps.store.logs.at(-1)?.event).toBe("refused_unknown_caller");
+  });
+
+  it("greets each caller with their own opening line", async () => {
+    const deps = makeDeps();
+    const owner = (await (await handleInit(signedRequest(INIT, initBody(OWNER_PHONE)), deps)).json()) as any;
+    expect(owner.dynamic_variables.greeting).toBe("Hey Owner, what do you need me to knock out for you?");
+    const stranger = (await (await handleInit(signedRequest(INIT, initBody(STRANGER_PHONE)), deps)).json()) as any;
+    expect(stranger.dynamic_variables.greeting).toBe(STRANGER_REPLY);
+    expect(stranger.dynamic_variables.greeting).not.toContain("Hey");
   });
 
   it("rejects requests not signed by Telnyx", async () => {

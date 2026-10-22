@@ -1,4 +1,4 @@
-import { memberInstructions, recipientInstructions, STRANGER_INSTRUCTIONS } from "../agentInstructions.js";
+import { memberGreeting, memberInstructions, RECIPIENT_CALL_GREETING, recipientInstructions, STRANGER_INSTRUCTIONS, STRANGER_REPLY } from "../agentInstructions.js";
 import { codeWordRequired } from "../codeWord.js";
 import { findPerson } from "../config.js";
 import type { Deps } from "../deps.js";
@@ -74,6 +74,7 @@ export async function handleInit(req: Request, deps: Deps): Promise<Response> {
         caller_name: "",
         code_word_required: "yes",
         role_instructions: outreach ? recipientInstructions(outreach.requesterName) : STRANGER_INSTRUCTIONS,
+        greeting: outreach ? RECIPIENT_CALL_GREETING : STRANGER_REPLY,
       },
       // An empty section clears any pass left over in this conversation.
       encrypted_dynamic_variables: {},
@@ -114,6 +115,7 @@ export async function handleInit(req: Request, deps: Deps): Promise<Response> {
       caller_name: person.name,
       code_word_required: needsCodeWord ? "yes" : "no",
       role_instructions: memberInstructions(person, deps.config.assistantName),
+      greeting: memberGreeting(person),
     },
     encrypted_dynamic_variables: {
       session_token: encryptForTelnyx(token, deps.config.telnyxEncryptionKey),
