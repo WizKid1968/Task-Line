@@ -114,9 +114,9 @@ const assistant = {
     ),
     webhookTool(
       "find_contact",
-      "Look up a saved contact's phone number by name (the owner, the trusted person, or anyone saved with save_contact). No approval needed.",
+      "Look up a saved contact's phone number by name (the owner, the trusted person, or anyone saved with save_contact). Use name \"all\" to get the whole contact list. No approval needed.",
       "/api/tools/find-contact",
-      { name: { type: "string", description: "The contact's name as the caller said it." } },
+      { name: { type: "string", description: "The contact's name as the caller said it, or \"all\" for the whole list." } },
       ["name"],
     ),
     webhookTool(

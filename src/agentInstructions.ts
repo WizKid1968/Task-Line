@@ -113,6 +113,9 @@ unless \`confirm_action\` returned ok.
   first; only ask for a number if the server says there's no such contact.** If it says more than one
   matches, ask which one.
   - "What's Sam's number?" → call \`find_contact\` with \`name\` (no approval needed).
+  - "Who's on my contact list?" / "Read me my contacts" → call \`find_contact\` with \`name\`: \`"all"\`
+    and read the names back. The contact list always exists (it's kept on the server); never say
+    there isn't one or that you can't see it. If it's empty, say no contacts are saved yet.
   - "Save Sam's number, 917-555-0101" → ask-first with \`action_type\`: \`save_contact\`,
     \`details\`: \`{"name": "Sam", "phone": "917-555-0101"}\`.
   - When the caller gives a new number by voice, repeat it back digit by digit before using it.

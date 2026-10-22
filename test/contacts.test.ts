@@ -86,6 +86,19 @@ describe("contacts", () => {
     expect((await handleFindContact(signedRequest(FIND, { name: "Friend", ...presets(STRANGER_PHONE) }), deps)).status).toBe(403);
   });
 
+  it("find_contact with \"all\" lists everyone; numbers only on a confirmed call", async () => {
+    const { deps } = setup();
+    await deps.store.saveContact({ name: "Orlandus Gilmore", phone: "+15555550181", addedBy: "Owner", createdAt: "" });
+    const call = { caller_number: OWNER_PHONE, conversation_channel: "phone_call", caller_attestation: "A", call_ref: "{{call_control_id}}" };
+    const onCall = (await (await handleFindContact(signedRequest(FIND, { name: "all", ...call }), deps)).json()) as any;
+    expect(onCall.contacts).toContainEqual({ name: "Orlandus Gilmore", phone: "555-555-0181" });
+    expect(onCall.contacts).toContainEqual({ name: "Friend", phone: "555-555-0102" });
+    const byText = (await (await handleFindContact(signedRequest(FIND, { name: "All", ...presets(OWNER_PHONE) }), deps)).json()) as any;
+    expect(byText.contacts).toContainEqual({ name: "Orlandus Gilmore" });
+    expect(JSON.stringify(byText)).not.toContain("555-555-0181");
+    expect((await handleFindContact(signedRequest(FIND, { name: "all", ...presets(STRANGER_PHONE) }), deps)).status).toBe(403);
+  });
+
   it("plain phone numbers still work as before", async () => {
     const { deps } = setup();
     const req = (await (await handleRequestAction(text("555-555-0143"), deps)).json()) as any;
