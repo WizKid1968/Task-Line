@@ -68,8 +68,9 @@ More detail: [`docs/SAFETY_RULES.md`](docs/SAFETY_RULES.md).
 |---|---|---|
 | Thinking (what Opus says) | Claude Haiku 4.5 (Anthropic), inside Telnyx | Fastest Claude model; the only Anthropic model Telnyx offers |
 | Hearing (speech to text) | Deepgram Flux | Set in the Telnyx portal |
-| **Voice (current)** | **Fish Audio "Nova"**, model S2.1 Pro | Since Oct 27, 2026. Voice ID `FishAudio.s2.1-pro.b545c585f631496c914815291da4e893` |
-| **Voice (backup)** | **Telnyx Ultra "Katie - Friendly Fixer"** | The voice used before Nova. Voice ID `Telnyx.Ultra.f786b574-daa5-4673-aa0c-cbe3e8534c02` |
+| **Voice (current)** | **Fish Audio "Claire"**, model S2.1 Pro (French accent) | Since Oct 27, 2026. Voice ID `FishAudio.s2.1-pro.5567200c7d8341738f0892bbacd3be3c` |
+| **Voice (backup)** | **Telnyx Ultra "Katie - Friendly Fixer"** | The original voice. Voice ID `Telnyx.Ultra.f786b574-daa5-4673-aa0c-cbe3e8534c02` |
+| Voice tried and dropped | Fish Audio "Nova" (and "Aria") | Slight echo. Voice ID `FishAudio.s2.1-pro.b545c585f631496c914815291da4e893` |
 
 Telnyx runs Fish Audio on its own account, so no Fish Audio key is needed. Only Telnyx's 10
 hand-picked Fish voices work (Aria, Nova, Paula, Claire, Yuki, Ethan, Atlas, Max, Adrian, Mateo).
@@ -78,7 +79,7 @@ Telnyx can't switch voices automatically if one fails, so switching back is a ma
 ```
 NODE_USE_ENV_PROXY=1 node scripts/set-voice.mjs katie         # shows the change
 NODE_USE_ENV_PROXY=1 node scripts/set-voice.mjs katie --yes   # switches back to Katie (saves a backup first)
-NODE_USE_ENV_PROXY=1 node scripts/set-voice.mjs nova --yes    # back to Nova
+NODE_USE_ENV_PROXY=1 node scripts/set-voice.mjs claire --yes  # back to Claire
 ```
 
 (`NODE_USE_ENV_PROXY=1` is only needed in a Claude Code cloud session. Elsewhere, add
@@ -222,5 +223,5 @@ npm run check   # type check plus all tests
 | "Not configured" on `/api/health` | A setting is missing in Vercel. The page lists which one, never its value |
 | Texts don't arrive | Texting registration (10DLC) must be approved (Telnyx error 40010 means it isn't) |
 | Bigger jobs never come back | The routine's API trigger address and token in Vercel, and the worker's report secret |
-| A caller says the voice sounds strange | Listen to the call recording in Telnyx. With the old Katie voice, calls from one carrier (Consumer Cellular) sometimes played at half speed; the switch to Fish Audio "Nova" is being tested as the fix |
+| A caller says the voice sounds strange | Listen to the call recording in Telnyx. With the old Katie voice, calls from one carrier (Consumer Cellular) sometimes played at half speed; the switch to Fish Audio voices is being tested as the fix |
 | Opus is silent or the voice fails | Fish Audio may be having trouble. Switch back to Katie with `scripts/set-voice.mjs katie --yes` |

@@ -3,10 +3,11 @@
 //
 // Usage:
 //   [TELNYX_ASSISTANT_NAME="Task-Line Agent"] [TELNYX_API_KEY=<key>] \
-//   node scripts/set-voice.mjs <nova|katie|full voice id> [--yes]
+//   node scripts/set-voice.mjs <claire|katie|nova|full voice id> [--yes]
 //
-//   nova   Fish Audio "Nova" (s2.1-pro), the main voice since Oct 27, 2026
-//   katie  Telnyx Ultra "Katie - Friendly Fixer", the backup (the voice before Nova)
+//   claire Fish Audio "Claire" (s2.1-pro), the main voice since Oct 27, 2026
+//   katie  Telnyx Ultra "Katie - Friendly Fixer", the backup (the original voice)
+//   nova   Fish Audio "Nova" (s2.1-pro), tried and dropped (slight echo)
 //
 // Without --yes it only shows the change. Before changing anything it saves the
 // assistant's current voice settings to voice-backup-<time>.json (to undo).
@@ -15,6 +16,7 @@
 import { writeFileSync } from "node:fs";
 
 export const VOICES = {
+  claire: "FishAudio.s2.1-pro.5567200c7d8341738f0892bbacd3be3c",
   nova: "FishAudio.s2.1-pro.b545c585f631496c914815291da4e893",
   katie: "Telnyx.Ultra.f786b574-daa5-4673-aa0c-cbe3e8534c02",
 };
