@@ -3,11 +3,11 @@
 //
 // Usage:
 //   [TELNYX_ASSISTANT_NAME="Task-Line Agent"] [TELNYX_API_KEY=<key>] \
-//   node scripts/set-voice.mjs <claire|katie|nova|full voice id> [--yes]
+//   node scripts/set-voice.mjs <nova|katie|claire|full voice id> [--yes]
 //
-//   claire Fish Audio "Claire" (s2.1-pro), the main voice since Oct 27, 2026
+//   nova   Fish Audio "Nova" (s2.1-pro), in use since Oct 27, 2026 (testing)
 //   katie  Telnyx Ultra "Katie - Friendly Fixer", the backup (the original voice)
-//   nova   Fish Audio "Nova" (s2.1-pro), tried and dropped (slight echo)
+//   claire Fish Audio "Claire" (s2.1-pro), tried and dropped
 //
 // Without --yes it only shows the change. Before changing anything it saves the
 // assistant's current voice settings to voice-backup-<time>.json (to undo).

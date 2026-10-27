@@ -68,9 +68,9 @@ More detail: [`docs/SAFETY_RULES.md`](docs/SAFETY_RULES.md).
 |---|---|---|
 | Thinking (what Opus says) | Claude Haiku 4.5 (Anthropic), inside Telnyx | Fastest Claude model; the only Anthropic model Telnyx offers |
 | Hearing (speech to text) | Deepgram Flux | Set in the Telnyx portal |
-| **Voice (current)** | **Fish Audio "Claire"**, model S2.1 Pro (French accent) | Since Oct 27, 2026. Voice ID `FishAudio.s2.1-pro.5567200c7d8341738f0892bbacd3be3c` |
+| **Voice (current, testing)** | **Fish Audio "Nova"**, model S2.1 Pro | Since Oct 27, 2026, while Damon tests the half-speed problem. Voice ID `FishAudio.s2.1-pro.b545c585f631496c914815291da4e893` |
 | **Voice (backup)** | **Telnyx Ultra "Katie - Friendly Fixer"** | The original voice. Voice ID `Telnyx.Ultra.f786b574-daa5-4673-aa0c-cbe3e8534c02` |
-| Voice tried and dropped | Fish Audio "Nova" (and "Aria") | Slight echo. Voice ID `FishAudio.s2.1-pro.b545c585f631496c914815291da4e893` |
+| Voices tried and dropped | Fish Audio "Claire" (sounded worse) and "Aria" (slight echo) | Nova also has a slight echo; it is in use only for testing. Claire: `FishAudio.s2.1-pro.5567200c7d8341738f0892bbacd3be3c` |
 
 Telnyx runs Fish Audio on its own account, so no Fish Audio key is needed. Only Telnyx's 10
 hand-picked Fish voices work (Aria, Nova, Paula, Claire, Yuki, Ethan, Atlas, Max, Adrian, Mateo).
@@ -79,7 +79,7 @@ Telnyx can't switch voices automatically if one fails, so switching back is a ma
 ```
 NODE_USE_ENV_PROXY=1 node scripts/set-voice.mjs katie         # shows the change
 NODE_USE_ENV_PROXY=1 node scripts/set-voice.mjs katie --yes   # switches back to Katie (saves a backup first)
-NODE_USE_ENV_PROXY=1 node scripts/set-voice.mjs claire --yes  # back to Claire
+NODE_USE_ENV_PROXY=1 node scripts/set-voice.mjs nova --yes    # back to Nova
 ```
 
 (`NODE_USE_ENV_PROXY=1` is only needed in a Claude Code cloud session. Elsewhere, add
